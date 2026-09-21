@@ -1,0 +1,173 @@
+/* =========================================================
+   MediFlow - Global Theme
+   Applied on every page using the saved Settings preference.
+   ========================================================= */
+
+body {
+    transition: background-color .2s ease, color .2s ease;
+}
+
+body.dark {
+    background: #111827 !important;
+    color: #e5e7eb !important;
+}
+
+body.dark .sidebar,
+body.dark .primary-service-card,
+body.dark .card,
+body.dark .setting-card,
+body.dark .feature-card,
+body.dark .quick-card,
+body.dark .library-card,
+body.dark .result-card,
+body.dark .info-box,
+body.dark .full-card,
+body.dark .hero,
+body.dark .map-section,
+body.dark .results-section,
+body.dark .search-container,
+body.dark .search-box,
+body.dark .search-box-large,
+body.dark .specialist-card,
+body.dark .map-card,
+body.dark .result-card,
+body.dark .health-card,
+body.dark .content-card,
+body.dark .hero-card,
+body.dark .topbar,
+body.dark .panel {
+    background: #1f2937 !important;
+    color: #e5e7eb !important;
+    border-color: #374151 !important;
+}
+
+body.dark .main,
+body.dark .content,
+body.dark .layout,
+body.dark .how-section,
+body.dark .feature-grid,
+body.dark .library-grid,
+body.dark .saved-results {
+    background: #111827 !important;
+    color: #e5e7eb !important;
+}
+
+body.dark h1,
+body.dark h2,
+body.dark h3,
+body.dark h4,
+body.dark strong,
+body.dark .logo-text,
+body.dark .card-title,
+body.dark .page-header,
+body.dark .header h1 {
+    color: #f9fafb !important;
+}
+
+body.dark p,
+body.dark .description,
+body.dark .setting-description,
+body.dark .specialist-label,
+body.dark .map-note,
+body.dark .header p,
+body.dark .topbar-search,
+body.dark .user {
+    color: #cbd5e1 !important;
+}
+
+body.dark .nav-item {
+    color: #d1d5db !important;
+}
+
+body.dark .nav-item:hover {
+    background: #374151 !important;
+}
+
+body.dark .nav-item.active {
+    color: #fff !important;
+    background: #2563eb !important;
+}
+
+body.dark input,
+body.dark textarea,
+body.dark select,
+body.dark button:not(.primary):not(.search-map-btn) {
+    background: #111827 !important;
+    color: #f3f4f6 !important;
+    border-color: #4b5563 !important;
+}
+
+body.dark input::placeholder,
+body.dark textarea::placeholder {
+    color: #94a3b8 !important;
+}
+
+body.dark .sidebar-footer {
+    color: #cbd5e1 !important;
+}
+
+body.dark .logo-icon {
+    color: #fff !important;
+}
+
+/* Keep the Leaflet map visually independent from the application theme. */
+body.dark .leaflet-container {
+    background: #0f172a;
+}
+
+.nav-icon {
+    width: 28px;
+    min-width: 28px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+}
+
+/* Page-specific text and controls */
+body.dark .hero p,
+body.dark .primary-service-card p,
+body.dark .feature-card p,
+body.dark .quick-card p,
+body.dark .library-card p,
+body.dark .info-box,
+body.dark .empty-state,
+body.dark .disclaimer { color: #cbd5e1 !important; }
+body.dark .section-title,
+body.dark .primary-service-card h3,
+body.dark .library-card h2,
+body.dark .feature-card h3,
+body.dark .quick-card h3,
+body.dark .result-card h2 { color: #f9fafb !important; }
+body.dark .map-section,
+body.dark .map-card { overflow: hidden; }
+
+.secondary-map-btn {
+    margin-left: 8px;
+    border: 1px solid #d0d5dd;
+    background: #fff;
+    color: #175cd3;
+    border-radius: 10px;
+    padding: 10px 14px;
+    cursor: pointer;
+    font-weight: 600;
+}
+.secondary-map-btn:hover { background: #f2f4f7; }
+
+.secondary-map-btn { margin-left:8px; border:1px solid #d0d5dd; background:#fff; color:#175cd3; border-radius:10px; padding:10px 14px; cursor:pointer; font-weight:600; }
+.secondary-map-btn:hover { background:#f2f4f7; }
+
+.profile-link{display:inline-block;padding:12px 18px;border-radius:10px;background:#1989e8;color:#fff;text-decoration:none;font-weight:700}.profile-link:hover{opacity:.92}
+
+
+/* Profile navigation and creator card */
+#globalProfileLink, .topbar .user {
+    cursor: pointer;
+}
+.hero-profile {
+    align-self: stretch;
+}
+
+body.dark .skin-card, body.dark .skin-wrap .drop, body.dark .pred { background:#1f2937 !important; color:#e5e7eb !important; border-color:#374151 !important; }
+body.dark .skin-wrap .muted { color:#cbd5e1 !important; }
+body.dark .meter { background:#374151 !important; }

@@ -1,0 +1,968 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>MediFlow - Find Specialists</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='style.css') }}">
+
+    <!-- Leaflet CSS - Free -->
+    <link rel="stylesheet"
+          href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f5f7fb;
+            color: #333;
+        }
+
+        .app {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* ================= SIDEBAR ================= */
+
+        .sidebar {
+            width: 250px;
+            background: white;
+            border-right: 1px solid #e5e7eb;
+            padding: 25px 18px;
+            position: fixed;
+            left: 0;
+            top: 0;
+            bottom: 0;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 35px;
+            padding-left: 10px;
+        }
+
+        .logo-icon {
+            width: 38px;
+            height: 38px;
+            border-radius: 10px;
+            background: #667eea;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            font-weight: bold;
+        }
+
+        .logo-text {
+            font-size: 22px;
+            font-weight: 700;
+            color: #333;
+        }
+
+        .nav {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 13px;
+            padding: 13px 15px;
+            border-radius: 10px;
+            text-decoration: none;
+            color: #666;
+            transition: 0.2s;
+        }
+
+        .nav-item:hover {
+            background: #f1f3ff;
+            color: #667eea;
+        }
+
+        .nav-item.active {
+            background: #667eea;
+            color: white;
+        }
+
+        .nav-icon {
+            width: 24px;
+            text-align: center;
+        }
+
+        /* ================= MAIN ================= */
+
+        .main {
+            margin-left: 250px;
+            width: calc(100% - 250px);
+        }
+
+        .topbar {
+            height: 75px;
+            background: white;
+            border-bottom: 1px solid #e5e7eb;
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            padding: 0 30px;
+        }
+
+        .user {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .avatar {
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            background: #667eea;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+        }
+
+        .content {
+            padding: 30px;
+        }
+
+        .page-header {
+            margin-bottom: 25px;
+        }
+
+        .page-header h1 {
+            margin: 0 0 8px;
+            font-size: 28px;
+            color: #222;
+        }
+
+        .page-header p {
+            margin: 0;
+            color: #777;
+        }
+
+        /* ================= SPECIALIST ================= */
+
+        .specialist-card {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 25px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.06);
+        }
+
+        .card-title {
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 20px;
+        }
+
+        .specialist-box {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 20px;
+            background: #f7f8ff;
+            border-radius: 12px;
+            padding: 20px;
+        }
+
+        .specialist-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .doctor-avatar {
+            width: 55px;
+            height: 55px;
+            border-radius: 50%;
+            background: #667eea;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 25px;
+        }
+
+        .specialist-name {
+            font-size: 18px;
+            font-weight: 700;
+            color: #333;
+        }
+
+        .specialist-label {
+            color: #777;
+            margin-top: 5px;
+        }
+
+        .search-map-btn {
+            border: none;
+            background: #667eea;
+            color: white;
+            padding: 12px 18px;
+            border-radius: 9px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+        .search-map-btn:hover {
+            opacity: 0.9;
+        }
+
+        /* ================= MAP ================= */
+
+        .map-card {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.06);
+        }
+
+        .map-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 18px;
+            gap: 15px;
+        }
+
+        .map-header h2 {
+            margin: 0;
+            font-size: 19px;
+        }
+
+        .map-search {
+            display: flex;
+            gap: 10px;
+        }
+
+        .map-search input {
+            width: 260px;
+            padding: 11px 14px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            outline: none;
+        }
+
+        .map-search button {
+            border: none;
+            background: #667eea;
+            color: white;
+            padding: 11px 18px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+        #map {
+            width: 100%;
+            height: 500px;
+            border-radius: 12px;
+            background: #e5e7eb;
+        }
+
+        .map-note {
+            margin-top: 12px;
+            color: #777;
+            font-size: 13px;
+        }
+
+        /* ================= RESPONSIVE ================= */
+
+        @media (max-width: 800px) {
+
+            .sidebar {
+                width: 210px;
+            }
+
+            .main {
+                margin-left: 210px;
+                width: calc(100% - 210px);
+            }
+
+            .content {
+                padding: 20px;
+            }
+
+            .specialist-box {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .map-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .map-search {
+                width: 100%;
+            }
+
+            .map-search input {
+                width: 100%;
+            }
+        }
+    </style>
+<script src="{{ url_for('static', filename='js/language.js') }}"></script>
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='theme.css') }}">
+</head>
+
+<body>
+
+<div class="app">
+
+    <!-- ================= SIDEBAR ================= -->
+
+    <aside class="sidebar">
+
+        <div class="logo">
+            <div class="logo-icon">+</div>
+            <div class="logo-text">MediFlow</div>
+        </div>
+
+    <nav class="nav">
+
+     <a href="{{ url_for('home') }}" class="nav-item">
+        <span class="nav-icon" aria-hidden="true">🏠</span>
+        <span data-i18n="Home">Home</span>
+     </a>
+
+      <a href="{{ url_for('skin_disease_analysis') }}" class="nav-item">🧴 <span data-i18n="Skin Disease Analysis">Skin Disease Analysis</span></a>
+<a href="{{ url_for('symptom_checker') }}" class="nav-item">
+         <span class="nav-icon" aria-hidden="true">🩺</span>
+         <span data-i18n="Symptom Checker">Symptom Checker</span>
+      </a>
+
+      <a href="{{ url_for('find_specialists') }}" class="nav-item active">
+         <span class="nav-icon" aria-hidden="true">📍</span>
+         <span data-i18n="Find Specialists">Find Specialists</span>
+      </a>
+
+      <a href="{{ url_for('health_library') }}" class="nav-item">
+         <span class="nav-icon" aria-hidden="true">📚</span>
+         <span data-i18n="Health Library">Health Library</span>
+      </a>
+
+      <a href="{{ url_for('saved_results') }}" class="nav-item">
+         <span class="nav-icon" aria-hidden="true">⭐</span>
+         <span data-i18n="Saved Results">Saved Results</span>
+      </a>
+
+      <a href="{{ url_for('settings') }}" class="nav-item">
+         <span class="nav-icon" aria-hidden="true">⚙️</span>
+         <span data-i18n="Settings">Settings</span>
+     </a>
+
+</nav>
+    </aside>
+
+
+    <!-- ================= MAIN ================= -->
+
+    <main class="main">
+
+        <div class="topbar">
+
+            <a class="user" href="{{ url_for('profile') }}" id="globalProfileLink" style="text-decoration:none;color:inherit;cursor:pointer;">
+                <div class="avatar" id="globalUserAvatar">MF</div>
+                <div id="globalUserName" data-i18n="MediFlow User">MediFlow User</div>
+            </a>
+
+        </div>
+
+
+        <div class="content">
+
+            <!-- PAGE HEADER -->
+
+            <div class="page-header">
+
+                <h1>Find Specialists</h1>
+
+                <p>
+                    Find recommended healthcare specialists and nearby
+                    hospitals or clinics.
+                </p>
+
+            </div>
+
+
+            <!-- ================= RECOMMENDED SPECIALIST ================= -->
+
+            <div class="specialist-card">
+
+                <div class="card-title">
+                    Recommended Specialist
+                </div>
+
+                <div class="specialist-box">
+
+                    <div class="specialist-info">
+
+                        <div class="doctor-avatar">
+                            ⚕
+                        </div>
+
+                        <div>
+
+                            <div
+                                class="specialist-name"
+                                id="specialistName"
+                            >
+                                General Practitioner
+                            </div>
+
+                            <div class="specialist-label">
+                                Based on your latest disease prediction
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                    <button
+                        class="search-map-btn"
+                        onclick="findNearbyOnGoogleMaps()"
+                    >
+                        📍 Find Nearby
+                    </button>
+
+                </div>
+
+            </div>
+
+
+            <!-- ================= MAP ================= -->
+
+            <div class="map-card">
+
+                <div class="map-header">
+
+                    <h2>
+                        📍 Nearby Specialists & Healthcare Facilities
+                    </h2>
+
+                    <div class="map-search">
+
+                        <input
+                            id="specialistSearch"
+                            type="text"
+                            placeholder="e.g. Cardiologist"
+                        >
+
+                        <button onclick="searchNearby()">
+                            Search
+                        </button>
+                        <button type="button" class="secondary-map-btn" onclick="searchNearbyHospitals()">
+                            🏥 Nearby Hospitals
+                        </button>
+
+                    </div>
+
+                </div>
+
+                <div id="map"></div>
+
+                <div id="mapStatus" class="map-note" role="status" aria-live="polite">
+                    Allow location access to find healthcare facilities near your current location.
+                </div>
+
+
+            </div>
+
+        </div>
+
+    </main>
+
+</div>
+
+
+<!-- ================= LEAFLET MAP ================= -->
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+<script>
+    let map;
+    let userLocation = null;
+    let currentMarkers = [];
+
+    const defaultLocation = {
+        lat: 3.1390,
+        lng: 101.6869
+    };
+
+
+    // ================= INITIALIZE MAP =================
+
+    function initMap() {
+
+        map = L.map("map").setView(
+            [defaultLocation.lat, defaultLocation.lng],
+            13
+        );
+
+        L.tileLayer(
+            "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+            {
+                attribution: "&copy; OpenStreetMap contributors"
+            }
+        ).addTo(map);
+
+
+        // Try to get user's location
+
+        if (navigator.geolocation) {
+
+            navigator.geolocation.getCurrentPosition(
+                function(position) {
+
+                    userLocation = {
+                        lat: position.coords.latitude,
+                        lng: position.coords.longitude
+                    };
+
+                    map.setView(
+                        [
+                            userLocation.lat,
+                            userLocation.lng
+                        ],
+                        14
+                    );
+
+                    addUserMarker();
+
+                    searchNearby();
+                },
+
+                function(error) {
+
+                    console.log(
+                        "Location permission denied."
+                    );
+
+                    searchNearby();
+                }
+            );
+
+        } else {
+            searchNearby();
+        }
+    }
+
+
+    // ================= USER LOCATION =================
+
+    function addUserMarker() {
+
+        if (!userLocation) {
+            return;
+        }
+
+        const marker = L.marker([
+            userLocation.lat,
+            userLocation.lng
+        ])
+        .addTo(map)
+        .bindPopup(
+            "<b>📍 Your Location</b>"
+        );
+
+        currentMarkers.push(marker);
+    }
+
+
+    // ================= CLEAR SEARCH MARKERS =================
+
+    function clearSearchMarkers() {
+
+        currentMarkers.forEach(
+            function(marker) {
+
+                map.removeLayer(marker);
+
+            }
+        );
+
+        currentMarkers = [];
+
+    }
+
+
+    // Open Google Maps only for the explicit "Find Nearby" action.
+    // The internal Search button continues to use MediFlow's own map.
+    function findNearbyOnGoogleMaps() {
+        const input = document.getElementById("specialistSearch");
+        const name = document.getElementById("specialistName");
+        const specialist = (input?.value || name?.textContent || "General Practitioner").trim();
+        const location = userLocation || defaultLocation;
+
+        // Search Google Maps for hospitals/medical centres that provide the
+        // recommended specialist near the user's current/default location.
+        const query = `${specialist} hospital medical centre near me`;
+        const url = new URL("https://www.google.com/maps/search/");
+        url.searchParams.set("api", "1");
+        url.searchParams.set("query", query);
+        url.searchParams.set("query_place_id", "");
+        // Google Maps will use the user's browser location when available.
+        // Coordinates are included in the query so the result is anchored to
+        // MediFlow's detected/default location even if browser geolocation is unavailable.
+        url.searchParams.set("center", `${location.lat},${location.lng}`);
+        url.searchParams.set("zoom", "14");
+        window.open(url.toString(), "_blank", "noopener,noreferrer");
+    }
+
+    // ================= SEARCH NEARBY =================
+
+    function setMapStatus(message, isError = false) {
+        const status = document.getElementById("mapStatus");
+        if (!status) return;
+        status.textContent = message;
+        status.style.color = isError ? "#b42318" : "#667085";
+    }
+
+    // ================= SPECIALIST-AWARE OSM SEARCH =================
+
+    const specialistAliases = {
+        "cardiologist": ["cardiology", "cardiac", "heart"],
+        "cardiology": ["cardiology", "cardiac", "heart"],
+        "gastroenterologist": ["gastroenterology", "gastro", "digestive"],
+        "gastroenterology": ["gastroenterology", "gastro", "digestive"],
+        "dermatologist": ["dermatology", "dermatological", "skin"],
+        "dermatology": ["dermatology", "dermatological", "skin"],
+        "neurologist": ["neurology", "neurological", "neuro"],
+        "neurology": ["neurology", "neurological", "neuro"],
+        "orthopedic": ["orthopaedics", "orthopedics", "orthopedic", "bone", "joint"],
+        "orthopaedic": ["orthopaedics", "orthopedics", "orthopedic", "bone", "joint"],
+        "orthopedist": ["orthopaedics", "orthopedics", "orthopedic", "bone", "joint"],
+        "pediatrician": ["paediatrics", "pediatrics", "pediatric", "children"],
+        "paediatrician": ["paediatrics", "pediatrics", "pediatric", "children"],
+        "gynecologist": ["gynaecology", "gynecology", "obstetrics", "women"],
+        "gynaecologist": ["gynaecology", "gynecology", "obstetrics", "women"],
+        "urologist": ["urology", "urinary", "kidney"],
+        "pulmonologist": ["pulmonology", "respiratory", "lung"],
+        "endocrinologist": ["endocrinology", "diabetes", "thyroid"],
+        "psychiatrist": ["psychiatry", "mental", "psychology"],
+        "psychologist": ["psychology", "mental", "psychiatry"],
+        "ophthalmologist": ["ophthalmology", "eye", "eyes"],
+        "otolaryngologist": ["otolaryngology", "ent", "ear", "nose", "throat"],
+        "ent specialist": ["otolaryngology", "ent", "ear", "nose", "throat"],
+        "dentist": ["dentistry", "dental", "oral"],
+        "general practitioner": ["general", "family", "primary"]
+    };
+
+    function getSpecialistTerms(specialist) {
+        const key = String(specialist || "").toLowerCase().trim();
+        if (specialistAliases[key]) return specialistAliases[key];
+        return key.replace(/[^a-z0-9 ]/g, " ").split(/\s+/).filter(w => w.length > 2);
+    }
+
+    function buildPopup(place) {
+        const tags = place.tags || {};
+        const name = tags.name || tags["official_name"] || "Healthcare Facility";
+        const specialty = tags["healthcare:speciality"] || tags["healthcare:specialty"] || tags.healthcare || "";
+        const address = [
+            tags["addr:housenumber"], tags["addr:street"],
+            tags["addr:suburb"], tags["addr:city"], tags["addr:postcode"], tags["addr:state"]
+        ].filter(Boolean).join(", ");
+        const lat = parseFloat(place.lat ?? place.center?.lat);
+        const lon = parseFloat(place.lon ?? place.center?.lon);
+        const osmUrl = Number.isFinite(lat) && Number.isFinite(lon)
+            ? `https://www.openstreetmap.org/?mlat=${lat}&mlon=${lon}#map=18/${lat}/${lon}` : "#";
+        const directionsUrl = Number.isFinite(lat) && Number.isFinite(lon)
+            ? `https://www.openstreetmap.org/directions?from=${userLocation ? `${userLocation.lat},${userLocation.lng}` : `${defaultLocation.lat},${defaultLocation.lng}`}&to=${lat},${lon}` : "#";
+        return `
+            <div style="min-width:250px;line-height:1.5;">
+                <strong>🏥 ${escapeHtml(name)}</strong>
+                ${specialty ? `<br><span>🩺 ${escapeHtml(specialty)}</span>` : ""}
+                <br><span>📍 ${escapeHtml(address || "Address available on map")}</span>
+                <div style="margin-top:8px;display:flex;gap:6px;flex-wrap:wrap;">
+                    ${osmUrl !== "#" ? `<a href="${osmUrl}" target="_blank" rel="noopener noreferrer" style="font-size:12px;">View facility</a>` : ""}
+                    ${directionsUrl !== "#" ? `<a href="${directionsUrl}" target="_blank" rel="noopener noreferrer" style="font-size:12px;">Get directions</a>` : ""}
+                </div>
+            </div>`;
+    }
+
+    function resultCoords(place) {
+        const lat = parseFloat(place.lat ?? place.center?.lat);
+        const lon = parseFloat(place.lon ?? place.center?.lon);
+        return Number.isFinite(lat) && Number.isFinite(lon) ? [lat, lon] : null;
+    }
+
+    function scorePlace(place, terms) {
+        const t = place.tags || {};
+        const haystack = [
+            t.name, t["official_name"], t["healthcare:speciality"],
+            t["healthcare:specialty"], t.healthcare, t["healthcare:speciality:en"]
+        ].filter(Boolean).join(" ").toLowerCase();
+        let score = 0;
+        terms.forEach(term => {
+            if (haystack.includes(term)) score += (haystack.includes(String(t.name || "").toLowerCase()) ? 4 : 2);
+        });
+        if (/hospital|clinic|doctors/.test(String(t.amenity || ""))) score += 1;
+        return score;
+    }
+
+    function addOverpassResults(elements, location, specialist, specialistOnly = false) {
+        const terms = getSpecialistTerms(specialist);
+        const valid = elements.map(place => ({place, coords: resultCoords(place)}))
+            .filter(x => x.coords);
+
+        const ranked = valid.map(x => ({...x, score: scorePlace(x.place, terms)}))
+            .sort((a, b) => b.score - a.score);
+
+        const selected = (specialistOnly
+            ? ranked.filter(x => x.score > 0)
+            : ranked).slice(0, 40);
+
+        if (!selected.length) return false;
+
+        let firstResult = null;
+        selected.forEach(({place, coords}) => {
+            if (!firstResult) firstResult = coords;
+            const marker = L.marker(coords).addTo(map);
+            marker.bindPopup(buildPopup(place));
+            currentMarkers.push(marker);
+        });
+
+        if (firstResult) {
+            map.setView(firstResult, 14);
+            setMapStatus(`${selected.length} relevant healthcare location${selected.length === 1 ? "" : "s"} found on the map.`);
+            return true;
+        }
+        return false;
+    }
+
+    async function overpassSearch(location, specialist, specialistOnly) {
+        const terms = getSpecialistTerms(specialist);
+        const escaped = terms.map(x => x.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")).filter(Boolean);
+        const specialistRegex = escaped.length ? escaped.join("|") : "";
+        const specialistParts = specialistRegex ? `
+            nwr["healthcare:speciality"~"${specialistRegex}",i](around:15000,${location.lat},${location.lng});
+            nwr["healthcare:specialty"~"${specialistRegex}",i](around:15000,${location.lat},${location.lng});
+            nwr["name"~"${specialistRegex}",i]["amenity"~"^(hospital|clinic|doctors)$"](around:15000,${location.lat},${location.lng});
+        ` : "";
+        const genericParts = `
+            nwr["amenity"~"^(hospital|clinic|doctors)$"](around:15000,${location.lat},${location.lng});
+            nwr["healthcare"](around:15000,${location.lat},${location.lng});
+        `;
+        const query = `[out:json][timeout:25];(${specialistOnly ? specialistParts : specialistParts + genericParts});out center tags;`;
+        const url = "https://overpass-api.de/api/interpreter?data=" + encodeURIComponent(query);
+        const response = await fetch(url, {headers: {"Accept": "application/json"}});
+        if (!response.ok) throw new Error("Overpass request failed");
+        const data = await response.json();
+        return addOverpassResults(data.elements || [], location, specialist, specialistOnly);
+    }
+
+    async function searchNominatimFallback(location, specialist) {
+        const terms = getSpecialistTerms(specialist);
+        const term = specialist ? `${specialist} hospital clinic` : "hospital clinic doctor";
+        const delta = 0.20;
+        const left = location.lng - delta, right = location.lng + delta;
+        const top = location.lat + delta, bottom = location.lat - delta;
+        const url = "https://nominatim.openstreetmap.org/search" +
+            "?format=jsonv2&q=" + encodeURIComponent(term) +
+            "&limit=30&addressdetails=1&viewbox=" +
+            encodeURIComponent(`${left},${top},${right},${bottom}`) + "&bounded=1";
+        const response = await fetch(url, {headers: {"Accept": "application/json"}});
+        if (!response.ok) throw new Error("Nominatim search failed");
+        const results = await response.json();
+        const ranked = results.map(place => ({place, score: scorePlace({tags: {name: place.name, healthcare: place.type}}, terms)}))
+            .sort((a,b) => b.score-a.score).slice(0,20);
+        let firstResult = null;
+        ranked.forEach(({place}) => {
+            const lat = parseFloat(place.lat), lon = parseFloat(place.lon);
+            if (!Number.isFinite(lat) || !Number.isFinite(lon)) return;
+            if (!firstResult) firstResult = [lat, lon];
+            const marker = L.marker([lat, lon]).addTo(map);
+            marker.bindPopup(`<div style="min-width:250px;line-height:1.5;"><strong>🏥 ${escapeHtml(place.name || "Healthcare Facility")}</strong><br><span>📍 ${escapeHtml(place.display_name || "Address not available")}</span><br><a href="https://www.openstreetmap.org/?mlat=${lat}&mlon=${lon}#map=18/${lat}/${lon}" target="_blank" rel="noopener noreferrer">View address</a></div>`);
+            currentMarkers.push(marker);
+        });
+        if (firstResult) {
+            map.setView(firstResult, 14);
+            setMapStatus(`${ranked.length} healthcare location${ranked.length === 1 ? "" : "s"} found.`);
+            return true;
+        }
+        return false;
+    }
+
+    // ================= SEARCH NEARBY =================
+
+    async function searchNearby() {
+        if (!map) return;
+
+        const input = document.getElementById("specialistSearch");
+        const name = document.getElementById("specialistName");
+        const specialist = (input?.value || name?.textContent || "").trim();
+        const location = userLocation || defaultLocation;
+
+        clearSearchMarkers();
+        setMapStatus(`Finding hospitals and healthcare facilities for ${specialist || "your needs"} near your location…`);
+
+        try {
+            // Use MediFlow's Flask backend. This avoids browser CORS/rate-limit
+            // problems and returns address-rich healthcare results.
+            const params = new URLSearchParams({
+                lat: String(location.lat),
+                lng: String(location.lng),
+                specialist: specialist
+            });
+            const response = await fetch(`/api/nearby-facilities?${params.toString()}`, {
+                headers: { "Accept": "application/json" }
+            });
+            const data = await response.json();
+            if (!response.ok || !data.success) throw new Error(data.error || "Facility search failed");
+
+            const facilities = Array.isArray(data.facilities) ? data.facilities : [];
+            if (!facilities.length) {
+                setMapStatus(`No healthcare facilities were found near your location. Try another specialist or move the map.`, true);
+                return;
+            }
+
+            const bounds = [];
+            facilities.forEach((facility, index) => {
+                const lat = Number(facility.lat);
+                const lng = Number(facility.lng);
+                if (!Number.isFinite(lat) || !Number.isFinite(lng)) return;
+                bounds.push([lat, lng]);
+
+                const marker = L.marker([lat, lng]).addTo(map);
+                const nameText = facility.name || "Healthcare Facility";
+                const addressText = facility.address || "Address not available";
+                const osmUrl = `https://www.openstreetmap.org/?mlat=${lat}&mlon=${lng}#map=18/${lat}/${lng}`;
+                const directionsUrl = `https://www.openstreetmap.org/directions?from=${location.lat},${location.lng}&to=${lat},${lng}`;
+
+                marker.bindPopup(`
+                    <div style="min-width:270px;line-height:1.5;">
+                        <strong>🏥 ${escapeHtml(nameText)}</strong>
+                        <br><span>📍 ${escapeHtml(addressText)}</span>
+                        <div style="margin-top:9px;display:flex;gap:10px;flex-wrap:wrap;">
+                            <a href="${osmUrl}" target="_blank" rel="noopener noreferrer">View address</a>
+                            <a href="${directionsUrl}" target="_blank" rel="noopener noreferrer">Get directions</a>
+                        </div>
+                    </div>
+                `);
+                currentMarkers.push(marker);
+
+                // Open the nearest result so the user immediately sees a real address.
+                if (index === 0) marker.openPopup();
+            });
+
+            if (bounds.length) {
+                map.fitBounds(bounds, { padding: [35, 35], maxZoom: 15 });
+            }
+            setMapStatus(`${bounds.length} nearby healthcare location${bounds.length === 1 ? "" : "s"} found. Click a marker to see the hospital/clinic address and directions.`);
+        } catch (error) {
+            console.error("MediFlow facility search failed:", error);
+            setMapStatus("The healthcare search could not connect. Check your internet connection and try Search again.", true);
+        }
+    }
+
+    // Hospital-focused search uses the same specialist-aware backend but makes
+    // the user's intent explicit: find hospitals that may provide this specialty.
+    async function searchNearbyHospitals() {
+        const input = document.getElementById("specialistSearch");
+        const name = document.getElementById("specialistName");
+        const specialist = (input?.value || name?.textContent || "").trim();
+        if (input && specialist) input.value = specialist;
+        await searchNearby();
+    }
+
+    // ================= ESCAPE HTML =================
+
+    function escapeHtml(value) {
+
+        if (!value) {
+            return "";
+        }
+
+        return String(value)
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;")
+            .replace(/"/g, "&quot;")
+            .replace(/'/g, "&#039;");
+
+    }
+
+
+    // ================= ENTER KEY =================
+
+    document.addEventListener(
+        "DOMContentLoaded",
+        function() {
+
+            const searchInput =
+                document.getElementById(
+                    "specialistSearch"
+                );
+
+            searchInput.addEventListener(
+                "keydown",
+                function(event) {
+
+                    if (event.key === "Enter") {
+
+                        searchNearby();
+
+                    }
+
+                }
+            );
+
+        }
+    );
+
+
+    // ================= START =================
+
+    document.addEventListener("DOMContentLoaded", function() {
+        const params = new URLSearchParams(window.location.search);
+        const specialistFromChecker = params.get("specialist");
+        let latestPrediction = null;
+        try {
+            latestPrediction = JSON.parse(localStorage.getItem("mediflow_latest_prediction")) || null;
+        } catch (error) {
+            latestPrediction = null;
+        }
+        const latestSpecialist = latestPrediction && (
+            latestPrediction.recommended_specialist ||
+            (latestPrediction.recommended_specialists && latestPrediction.recommended_specialists[0])
+        );
+        const input = document.getElementById("specialistSearch");
+        const name = document.getElementById("specialistName");
+
+        if (specialistFromChecker || latestSpecialist) {
+            const value = (specialistFromChecker || latestSpecialist).trim();
+            if (input) input.value = value;
+            if (name && value) name.textContent = value;
+        }
+
+        initMap();
+
+        // Leaflet needs a layout pass after the page is visible.
+        setTimeout(() => {
+            if (map) map.invalidateSize();
+        }, 250);
+    });
+
+</script>
+
+</body>
+</html>

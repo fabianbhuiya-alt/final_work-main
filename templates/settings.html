@@ -1,0 +1,1240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title data-i18n="MediFlow - Settings">MediFlow - Settings</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #f5f7fb;
+            color: #1f2937;
+            transition: 0.3s;
+        }
+
+        .layout {
+            display: flex;
+            min-height: 100vh;
+            width: 100%;
+            align-items: flex-start;
+        }
+
+        /* SIDEBAR */
+        .sidebar {
+            width: 240px;
+            min-height: 100vh;
+            flex: 0 0 240px;
+            background: #ffffff;
+            border-right: 1px solid #e5e7eb;
+            padding: 20px 15px;
+            position: sticky;
+            top: 0;
+        }
+
+        .logo {
+            font-size: 24px;
+            font-weight: bold;
+            color: #2563eb;
+            margin-bottom: 25px;
+            padding-left: 15px;
+        }
+
+        .settings-sidebar-nav .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .settings-sidebar-nav .nav-icon {
+            width: 24px;
+            text-align: center;
+            font-size: 18px;
+            flex: 0 0 24px;
+        }
+
+        .nav-item {
+            display: block;
+            text-decoration: none;
+            color: #4b5563;
+            padding: 13px 15px;
+            border-radius: 10px;
+            margin-bottom: 8px;
+        }
+
+        .nav-item:hover {
+            background: #eef4ff;
+        }
+
+        .nav-item.active {
+            background: #2563eb;
+            color: white;
+        }
+
+        /* MAIN */
+        .main {
+            flex: 1 1 auto;
+            width: calc(100% - 240px);
+            min-width: 0;
+            padding: 22px 30px 40px;
+            max-width: none;
+        }
+
+        /* Keep the Settings content close to the top instead of leaving an
+           unnecessary empty band above the page heading. */
+        .header {
+            margin: 0 0 20px;
+            padding: 0;
+        }
+
+        .header h1 {
+            margin: 0 0 8px;
+            font-size: 32px;
+        }
+
+        .header p {
+            margin: 0;
+            color: #6b7280;
+        }
+
+        .card {
+            background: white;
+            border-radius: 15px;
+            padding: 22px 25px;
+            margin-bottom: 18px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+
+        .card h2 {
+            margin-top: 0;
+            font-size: 20px;
+        }
+
+        .description {
+            color: #6b7280;
+            margin-bottom: 20px;
+        }
+
+        .setting-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 20px;
+            padding: 16px 0;
+            border-bottom: 1px solid #eee;
+        }
+
+        .setting-row:last-child {
+            border-bottom: none;
+        }
+
+        .setting-title {
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .setting-description {
+            color: #6b7280;
+            font-size: 14px;
+        }
+
+        select,
+        input[type="text"] {
+            padding: 10px 14px;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            background: white;
+            min-width: 190px;
+        }
+
+        /* TOGGLE */
+        .switch {
+            position: relative;
+            width: 48px;
+            height: 26px;
+            display: inline-block;
+        }
+
+        .switch input {
+            display: none;
+        }
+
+        .slider {
+            position: absolute;
+            inset: 0;
+            background: #d1d5db;
+            border-radius: 30px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .slider:before {
+            content: "";
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            left: 3px;
+            top: 3px;
+            background: white;
+            border-radius: 50%;
+            transition: 0.3s;
+        }
+
+        input:checked + .slider {
+            background: #2563eb;
+        }
+
+        input:checked + .slider:before {
+            transform: translateX(22px);
+        }
+
+        .save-message {
+            display: none;
+            position: fixed;
+            bottom: 25px;
+            right: 25px;
+            background: #16a34a;
+            color: white;
+            padding: 13px 20px;
+            border-radius: 10px;
+            z-index: 1000;
+        }
+
+        .danger {
+            background: #dc2626;
+            color: white;
+            border: none;
+            padding: 11px 18px;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+
+        .danger:hover {
+            background: #b91c1c;
+        }
+
+        .disclaimer {
+            background: #fff7ed;
+            border-left: 4px solid #f97316;
+        }
+
+        /* DARK MODE */
+        body.dark {
+            background: #111827;
+            color: #f9fafb;
+        }
+
+        body.dark .sidebar,
+        body.dark .card {
+            background: #1f2937;
+            border-color: #374151;
+        }
+
+        body.dark .nav-item {
+            color: #d1d5db;
+        }
+
+        body.dark .nav-item:hover {
+            background: #374151;
+        }
+
+        body.dark .nav-item.active {
+            background: #2563eb;
+            color: white;
+        }
+
+        body.dark .header p,
+        body.dark .description,
+        body.dark .setting-description {
+            color: #9ca3af;
+        }
+
+        body.dark .setting-row {
+            border-color: #374151;
+        }
+
+        body.dark select,
+        body.dark input[type="text"] {
+            background: #111827;
+            color: white;
+            border-color: #4b5563;
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 180px;
+                flex-basis: 180px;
+            }
+
+            .main {
+                width: calc(100% - 180px);
+                padding: 18px 20px 30px;
+            }
+
+            .setting-row {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+        }
+    </style>
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='theme.css') }}">
+</head>
+
+<body>
+
+<div class="layout">
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+
+        <div class="logo">
+            MediFlow
+        </div>
+
+        <a href="/" class="nav-item">
+            🏠 <span data-i18n="Home">Home</span>
+        </a>
+
+        <a href="{{ url_for('skin_disease_analysis') }}" class="nav-item">🧴 <span data-i18n="Skin Disease Analysis">Skin Disease Analysis</span></a>
+        <a href="/symptom_checker" class="nav-item">
+            🩺 <span data-i18n="Symptom Checker">Symptom Checker</span>
+        </a>
+
+        <a href="/find_specialists" class="nav-item">
+            📍 <span data-i18n="Find Specialists">Find Specialists</span>
+        </a>
+
+        <a href="/health_library" class="nav-item">
+            📚 <span data-i18n="Health Library">Health Library</span>
+        </a>
+
+        <a href="/saved_results" class="nav-item">
+            💾 <span data-i18n="Saved Results">Saved Results</span>
+        </a>
+
+        <a href="/settings" class="nav-item active">
+            ⚙ <span data-i18n="Settings">Settings</span>
+        </a>
+
+    </aside>
+
+
+    <!-- MAIN CONTENT -->
+    <main class="main">
+
+        <div class="header">
+
+            <h1 data-i18n="Settings">
+                Settings
+            </h1>
+
+            <p data-i18n="Customize your MediFlow experience and preferences.">
+                Customize your MediFlow experience and preferences.
+            </p>
+
+        </div>
+
+
+        <!-- PROFILE -->
+        <section class="card">
+
+            <h2 data-i18n="👤 Profile">
+                👤 Profile
+            </h2>
+
+            <p
+                class="description"
+                data-i18n="Manage your basic MediFlow profile information."
+            >
+                Manage your basic MediFlow profile information.
+            </p>
+
+            <div class="setting-row">
+
+                <div>
+
+                    <div
+                        class="setting-title"
+                        data-i18n="User Name"
+                    >
+                        User Name
+                    </div>
+
+                    <div
+                        class="setting-description"
+                        data-i18n="Your display name"
+                    >
+                        Your display name
+                    </div>
+
+                </div>
+
+                <input
+                    type="text"
+                    id="userName"
+                    placeholder="Your display name"
+                    data-i18n-placeholder="Your display name"
+                >
+
+            </div>
+
+
+            <div class="setting-row">
+
+                <div>
+
+                    <div
+                        class="setting-title"
+                        data-i18n="Account Type"
+                    >
+                        Account Type
+                    </div>
+
+                    <div
+                        class="setting-description"
+                        data-i18n="Current account"
+                    >
+                        Current account
+                    </div>
+
+                </div>
+
+                <strong data-i18n="Standard User">
+                    Standard User
+                </strong>
+
+            </div>
+
+        </section>
+
+
+        <div style="margin-top:18px;"><a href="{{ url_for('profile') }}" class="profile-link">Create / Update Full Profile</a></div>
+
+        <!-- APPEARANCE -->
+        <section class="card">
+
+            <h2 data-i18n="🌙 Appearance">
+                🌙 Appearance
+            </h2>
+
+            <p
+                class="description"
+                data-i18n="Choose how MediFlow looks on your device."
+            >
+                Choose how MediFlow looks on your device.
+            </p>
+
+            <div class="setting-row">
+
+                <div>
+
+                    <div
+                        class="setting-title"
+                        data-i18n="Theme"
+                    >
+                        Theme
+                    </div>
+
+                    <div
+                        class="setting-description"
+                        data-i18n="Select your preferred appearance"
+                    >
+                        Select your preferred appearance
+                    </div>
+
+                </div>
+
+                <select
+                    id="themeSelect"
+                    onchange="saveSetting('theme', this.value)"
+                >
+
+                    <option
+                        value="light"
+                        data-i18n="Light"
+                    >
+                        Light
+                    </option>
+
+                    <option
+                        value="dark"
+                        data-i18n="Dark"
+                    >
+                        Dark
+                    </option>
+
+                </select>
+
+            </div>
+
+        </section>
+
+
+        <!-- LANGUAGE -->
+        <section class="card">
+
+            <h2 data-i18n="🌐 Language">
+                🌐 Language
+            </h2>
+
+            <p
+                class="description"
+                data-i18n="Select the language used by the application."
+            >
+                Select the language used by the application.
+            </p>
+
+            <div class="setting-row">
+
+                <div>
+
+                    <div
+                        class="setting-title"
+                        data-i18n="Application Language"
+                    >
+                        Application Language
+                    </div>
+
+                    <div
+                        class="setting-description"
+                        data-i18n="Choose your preferred language"
+                    >
+                        Choose your preferred language
+                    </div>
+
+                </div>
+
+                <select
+                    id="languageSelect"
+                    onchange="saveSetting('language', this.value)"
+                >
+
+                    <option
+                        value="English"
+                        data-i18n="English"
+                    >
+                        English
+                    </option>
+
+                    <option
+                        value="Bangla"
+                        data-i18n="Bangla"
+                    >
+                        Bangla
+                    </option>
+
+                </select>
+
+            </div>
+
+        </section>
+
+
+        <!-- NOTIFICATIONS -->
+        <section class="card">
+
+            <h2 data-i18n="🔔 Notifications">
+                🔔 Notifications
+            </h2>
+
+            <p
+                class="description"
+                data-i18n="Control application notifications."
+            >
+                Control application notifications.
+            </p>
+
+
+            <div class="setting-row">
+
+                <div>
+
+                    <div
+                        class="setting-title"
+                        data-i18n="Health Reminders"
+                    >
+                        Health Reminders
+                    </div>
+
+                    <div
+                        class="setting-description"
+                        data-i18n="Receive health-related reminders"
+                    >
+                        Receive health-related reminders
+                    </div>
+
+                </div>
+
+                <label class="switch">
+
+                    <input
+                        type="checkbox"
+                        id="healthReminder"
+                        onchange="saveToggle('healthReminder', this.checked)"
+                    >
+
+                    <span class="slider"></span>
+
+                </label>
+
+            </div>
+
+
+            <div class="setting-row">
+
+                <div>
+
+                    <div
+                        class="setting-title"
+                        data-i18n="Analysis Notifications"
+                    >
+                        Analysis Notifications
+                    </div>
+
+                    <div
+                        class="setting-description"
+                        data-i18n="Notifications about analysis results"
+                    >
+                        Notifications about analysis results
+                    </div>
+
+                </div>
+
+                <label class="switch">
+
+                    <input
+                        type="checkbox"
+                        id="analysisNotification"
+                        onchange="saveToggle('analysisNotification', this.checked)"
+                    >
+
+                    <span class="slider"></span>
+
+                </label>
+
+            </div>
+
+        </section>
+
+
+        <!-- PRIVACY -->
+        <section class="card">
+
+            <h2 data-i18n="🔒 Privacy">
+                🔒 Privacy
+            </h2>
+
+            <p
+                class="description"
+                data-i18n="Manage your local health data preferences."
+            >
+                Manage your local health data preferences.
+            </p>
+
+
+            <div class="setting-row">
+
+                <div>
+
+                    <div
+                        class="setting-title"
+                        data-i18n="Save Analysis Results"
+                    >
+                        Save Analysis Results
+                    </div>
+
+                    <div
+                        class="setting-description"
+                        data-i18n="Allow MediFlow to save your results"
+                    >
+                        Allow MediFlow to save your results
+                    </div>
+
+                </div>
+
+                <label class="switch">
+
+                    <input
+                        type="checkbox"
+                        id="saveResults"
+                        onchange="saveToggle('saveResults', this.checked)"
+                    >
+
+                    <span class="slider"></span>
+
+                </label>
+
+            </div>
+
+        </section>
+
+
+        <!-- MEDICAL PREFERENCES -->
+        <section class="card">
+
+            <h2 data-i18n="🩺 Medical Preferences">
+                🩺 Medical Preferences
+            </h2>
+
+            <p
+                class="description"
+                data-i18n="Set preferences for specialist recommendations."
+            >
+                Set preferences for specialist recommendations.
+            </p>
+
+
+            <div class="setting-row">
+
+                <div>
+
+                    <div
+                        class="setting-title"
+                        data-i18n="Default Specialist"
+                    >
+                        Default Specialist
+                    </div>
+
+                    <div
+                        class="setting-description"
+                        data-i18n="Preferred specialist category"
+                    >
+                        Preferred specialist category
+                    </div>
+
+                </div>
+
+                <select
+                    id="specialistSelect"
+                    onchange="saveSetting('specialist', this.value)"
+                >
+
+                    <option
+                        value="General Practitioner"
+                        data-i18n="General Practitioner"
+                    >
+                        General Practitioner
+                    </option>
+
+                    <option
+                        value="Cardiologist"
+                        data-i18n="Cardiologist"
+                    >
+                        Cardiologist
+                    </option>
+
+                    <option
+                        value="Dermatologist"
+                        data-i18n="Dermatologist"
+                    >
+                        Dermatologist
+                    </option>
+
+                    <option
+                        value="Neurologist"
+                        data-i18n="Neurologist"
+                    >
+                        Neurologist
+                    </option>
+
+                    <option
+                        value="Pediatrician"
+                        data-i18n="Pediatrician"
+                    >
+                        Pediatrician
+                    </option>
+
+                </select>
+
+            </div>
+
+        </section>
+
+
+        <!-- LOCATION -->
+        <section class="card">
+
+            <h2 data-i18n="📍 Location">
+                📍 Location
+            </h2>
+
+            <p
+                class="description"
+                data-i18n="Location access helps find nearby healthcare facilities."
+            >
+                Location access helps find nearby healthcare facilities.
+            </p>
+
+
+            <div class="setting-row">
+
+                <div>
+
+                    <div
+                        class="setting-title"
+                        data-i18n="Location Permission"
+                    >
+                        Location Permission
+                    </div>
+
+                    <div
+                        class="setting-description"
+                        data-i18n="Allow location-based specialist search"
+                    >
+                        Allow location-based specialist search
+                    </div>
+
+                </div>
+
+                <label class="switch">
+
+                    <input
+                        type="checkbox"
+                        id="locationPermission"
+                        onchange="saveToggle('locationPermission', this.checked)"
+                    >
+
+                    <span class="slider"></span>
+
+                </label>
+
+            </div>
+
+        </section>
+
+
+        <!-- CLEAR DATA -->
+        <section class="card">
+
+            <h2 data-i18n="🗑️ Clear Saved Data">
+                🗑️ Clear Saved Data
+            </h2>
+
+            <p
+                class="description"
+                data-i18n="Remove locally saved MediFlow analysis information."
+            >
+                Remove locally saved MediFlow analysis information.
+            </p>
+
+            <button
+                class="danger"
+                onclick="clearSavedData()"
+                data-i18n="Clear Saved Data"
+            >
+                Clear Saved Data
+            </button>
+
+        </section>
+
+
+        <!-- ABOUT -->
+        <section class="card">
+
+            <h2 data-i18n="ℹ️ About MediFlow">
+                ℹ️ About MediFlow
+            </h2>
+
+            <p
+                class="description"
+                data-i18n="Information about this application."
+            >
+                Information about this application.
+            </p>
+
+            <h3 data-i18n="AI Healthcare Assistant">
+                AI Healthcare Assistant
+            </h3>
+
+            <p
+                data-i18n="MediFlow provides informational disease predictions based on the available dataset."
+            >
+                MediFlow provides informational disease predictions
+                based on the available dataset.
+            </p>
+
+        </section>
+
+
+        <!-- DISCLAIMER -->
+        <section class="card disclaimer">
+
+            <h3 data-i18n="⚠ Medical Disclaimer">
+                ⚠ Medical Disclaimer
+            </h3>
+
+            <p
+                data-i18n="MediFlow is not a substitute for professional medical diagnosis, treatment, or medical advice. Always consult a qualified healthcare professional."
+            >
+                MediFlow is not a substitute for professional medical
+                diagnosis, treatment, or medical advice.
+                Always consult a qualified healthcare professional.
+            </p>
+
+        </section>
+
+    </main>
+
+</div>
+
+
+<!-- SAVE MESSAGE -->
+<div
+    id="saveMessage"
+    class="save-message"
+    data-i18n="✓ Setting saved successfully."
+>
+    ✓ Setting saved successfully.
+</div>
+
+
+<!-- LANGUAGE.JS -->
+<script src="/static/js/language.js"></script>
+
+
+<script>
+
+    /* ===============================
+       SAVE NORMAL SETTING
+       =============================== */
+
+    function saveSetting(key, value) {
+
+        /* LANGUAGE MUST USE "language"
+           BECAUSE language.js USES THIS KEY */
+
+        if (key === "language") {
+
+            const selectedLanguage =
+                (typeof setCurrentLanguage === "function")
+                    ? setCurrentLanguage(value)
+                    : (value === "Bangla" ? "Bangla" : "English");
+
+            localStorage.setItem("mediflow_language", selectedLanguage);
+            localStorage.setItem("language", selectedLanguage);
+
+            /* Apply language immediately */
+
+            if (typeof applyLanguage === "function") {
+                applyLanguage();
+            }
+
+            showSavedMessage();
+
+            return;
+        }
+
+
+        /* Other settings */
+
+        localStorage.setItem(
+            "mediflow_" + key,
+            value
+        );
+
+
+        if (key === "theme") {
+            changeTheme(value);
+        }
+
+
+        showSavedMessage();
+    }
+
+
+    /* ===============================
+       SAVE TOGGLE
+       =============================== */
+
+    function saveToggle(key, value) {
+
+        localStorage.setItem(
+            "mediflow_" + key,
+            value
+        );
+
+        showSavedMessage();
+    }
+
+
+    /* ===============================
+       SAVE MESSAGE
+       =============================== */
+
+    function showSavedMessage() {
+
+        const message =
+            document.getElementById("saveMessage");
+
+        if (!message) return;
+
+        message.style.display = "block";
+
+        setTimeout(() => {
+            message.style.display = "none";
+        }, 2000);
+    }
+
+
+    /* ===============================
+       THEME
+       =============================== */
+
+    function changeTheme(theme) {
+
+        if (theme === "dark") {
+
+            document.body.classList.add("dark");
+
+        } else {
+
+            document.body.classList.remove("dark");
+
+        }
+
+        localStorage.setItem(
+            "mediflow_theme",
+            theme
+        );
+    }
+
+
+    /* ===============================
+       CLEAR SAVED DATA
+       =============================== */
+
+    function clearSavedData() {
+
+        const confirmed = confirm(
+            "Are you sure you want to clear saved MediFlow data?"
+        );
+
+        if (!confirmed) {
+            return;
+        }
+
+
+        const keys = [
+
+            "language",
+            "mediflow_theme",
+            "mediflow_healthReminder",
+            "mediflow_analysisNotification",
+            "mediflow_saveResults",
+            "mediflow_specialist",
+            "mediflow_locationPermission",
+            "mediflow_savedResults",
+            "mediflow_userName"
+
+        ];
+
+
+        keys.forEach(key => {
+
+            localStorage.removeItem(key);
+
+        });
+
+
+        alert(
+            "Saved MediFlow data has been cleared."
+        );
+
+
+        location.reload();
+    }
+
+
+    /* ===============================
+       LOAD SETTINGS
+       =============================== */
+
+    function loadSettings() {
+
+
+        /* LANGUAGE */
+
+        const language =
+            (typeof getCurrentLanguage === "function")
+                ? getCurrentLanguage()
+                : (localStorage.getItem("mediflow_language") || localStorage.getItem("language") || "English");
+
+
+        const languageSelect =
+            document.getElementById(
+                "languageSelect"
+            );
+
+
+        if (languageSelect) {
+
+            languageSelect.value =
+                language || "English";
+
+        }
+
+
+        /* THEME */
+
+        const theme =
+            localStorage.getItem(
+                "mediflow_theme"
+            );
+
+
+        const themeSelect =
+            document.getElementById(
+                "themeSelect"
+            );
+
+
+        if (themeSelect && theme) {
+
+            themeSelect.value =
+                theme;
+
+            changeTheme(theme);
+
+        }
+
+
+        /* SPECIALIST */
+
+        const specialist =
+            localStorage.getItem(
+                "mediflow_specialist"
+            );
+
+
+        const specialistSelect =
+            document.getElementById(
+                "specialistSelect"
+            );
+
+
+        if (specialistSelect && specialist) {
+
+            specialistSelect.value =
+                specialist;
+
+        }
+
+
+        /* TOGGLES */
+
+        const toggleIds = [
+
+            "healthReminder",
+            "analysisNotification",
+            "saveResults",
+            "locationPermission"
+
+        ];
+
+
+        toggleIds.forEach(id => {
+
+            const saved =
+                localStorage.getItem(
+                    "mediflow_" + id
+                );
+
+
+            if (saved !== null) {
+
+                const element =
+                    document.getElementById(id);
+
+
+                if (element) {
+
+                    element.checked =
+                        saved === "true";
+
+                }
+
+            }
+
+        });
+
+
+        /* USER NAME */
+
+        const userName =
+            localStorage.getItem(
+                "mediflow_userName"
+            );
+
+
+        const userNameInput =
+            document.getElementById(
+                "userName"
+            );
+
+
+        if (userNameInput && userName) {
+
+            userNameInput.value =
+                userName;
+
+        }
+
+
+        /* APPLY SAVED LANGUAGE */
+
+        if (
+            language === "Bangla" &&
+            typeof applyLanguage === "function"
+        ) {
+
+            applyLanguage();
+
+        }
+
+    }
+
+
+    /* ===============================
+       USER NAME
+       =============================== */
+
+    const userNameElement =
+        document.getElementById("userName");
+
+
+    if (userNameElement) {
+
+        userNameElement.addEventListener(
+            "change",
+            function () {
+
+                localStorage.setItem(
+                    "mediflow_userName",
+                    this.value
+                );
+
+                showSavedMessage();
+
+            }
+        );
+
+    }
+
+
+    /* ===============================
+       START
+       =============================== */
+
+    loadSettings();
+
+</script>
+
+</body>
+</html>

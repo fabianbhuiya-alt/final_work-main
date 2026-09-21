@@ -1,0 +1,1292 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MediFlow</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 40px;
+        }
+        
+        .header h1 {
+            font-size: 3em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+        }
+        
+        .header p {
+            font-size: 1.2em;
+            opacity: 0.95;
+        }
+        
+        /* Main Content Area */
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+        
+        @media (max-width: 1024px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        .card {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+            padding: 30px;
+            animation: slideUp 0.5s ease;
+        }
+        
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .card h2 {
+            color: #667eea;
+            margin-bottom: 20px;
+            font-size: 1.5em;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        /* Tab Buttons */
+        .input-mode-tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            background: #f5f5f5;
+            padding: 5px;
+            border-radius: 10px;
+        }
+        
+        .tab-btn {
+            flex: 1;
+            padding: 12px 20px;
+            background: transparent;
+            color: #666;
+            border: none;
+            border-radius: 8px;
+            font-size: 0.95em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .tab-btn.active {
+            background: white;
+            color: #667eea;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+        
+        .tab-btn:hover {
+            color: #667eea;
+        }
+        
+        /* Input Modes */
+        .input-mode {
+            display: none;
+        }
+        
+        .input-mode.active {
+            display: block;
+        }
+        
+        /* Search Box Styling */
+        .search-container {
+            position: relative;
+            margin-bottom: 25px;
+            min-height: 54px;
+        }
+        
+        .search-box {
+            width: 100%;
+            padding: 15px 20px;
+            font-size: 1em;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            transition: all 0.3s ease;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        .search-box-large {
+            min-height: 120px;
+            resize: vertical;
+            padding: 15px 20px;
+        }
+        
+        .search-box:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+        
+        .search-box::placeholder {
+            color: #999;
+        }
+        
+        .autocomplete-list {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: white;
+            border: 1px solid #e0e0e0;
+            border-top: none;
+            border-radius: 0 0 10px 10px;
+            max-height: 300px;
+            overflow-y: auto;
+            display: none;
+            z-index: 1000;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+        }
+        
+        .autocomplete-list.show {
+            display: block;
+        }
+        
+        .autocomplete-item {
+            padding: 12px 20px;
+            cursor: pointer;
+            transition: background 0.2s ease;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        
+        .autocomplete-item:last-child {
+            border-bottom: none;
+        }
+        
+        .autocomplete-item:hover {
+            background: #f5f5f5;
+        }
+        
+        .autocomplete-item.highlighted {
+            background: #667eea;
+            color: white;
+        }
+        
+        /* Selected Symptoms Display */
+        .selected-symptoms {
+            margin-top: 20px;
+            padding: 15px;
+            background: #f9f9f9;
+            border-radius: 10px;
+            min-height: 50px;
+        }
+        
+        .detected-symptoms-info {
+            padding: 15px;
+            background: #e8f5e9;
+            border-left: 4px solid #4caf50;
+            border-radius: 8px;
+            margin-top: 15px;
+        }
+        
+        .detected-symptoms-info h4 {
+            color: #2e7d32;
+            margin-bottom: 10px;
+            font-size: 0.95em;
+        }
+        
+        .symptom-tag {
+            display: inline-block;
+            background: #667eea;
+            color: white;
+            padding: 8px 15px;
+            border-radius: 20px;
+            margin: 5px 5px 5px 0;
+            font-size: 0.9em;
+            position: relative;
+            padding-right: 30px;
+        }
+        
+        .symptom-tag.detected {
+            background: #4caf50;
+        }
+        
+        .symptom-tag .remove {
+            position: absolute;
+            right: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            opacity: 0.7;
+            transition: opacity 0.2s;
+        }
+        
+        .symptom-tag .remove:hover {
+            opacity: 1;
+        }
+        
+        .no-symptoms {
+            color: #999;
+            font-style: italic;
+        }
+        
+        /* Buttons */
+        .button-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        
+        button {
+            flex: 1;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+        
+        .btn-primary:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .btn-secondary {
+            background: #f0f0f0;
+            color: #333;
+        }
+        
+        .btn-secondary:hover {
+            background: #e0e0e0;
+        }
+        
+        /* Results Section */
+        .results-section {
+            display: none;
+        }
+        
+        .results-section.show {
+            display: block;
+            animation: slideUp 0.5s ease;
+        }
+        
+        .result-card {
+            background: #f9f9f9;
+            padding: 20px;
+            border-radius: 10px;
+            border-left: 4px solid #667eea;
+            margin-bottom: 20px;
+        }
+        
+        .disease-prediction {
+            display: block;
+            margin-bottom: 20px;
+        }
+        
+        .disease-name {
+            font-size: 1.8em;
+            font-weight: bold;
+            color: #667eea;
+            margin-bottom: 10px;
+        }
+        
+        /* Specialists Section */
+        .specialists-section {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .specialists-section h3 {
+            color: #333;
+            margin-bottom: 15px;
+            font-size: 1.1em;
+        }
+        
+        .specialist-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        
+        .specialist-badge {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 10px 18px;
+            border-radius: 25px;
+            font-size: 0.95em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: none;
+        }
+        
+        .specialist-badge:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+        }
+        
+        /* Map Section */
+        .map-section {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .map-section h3 {
+            color: #333;
+            margin-bottom: 15px;
+            font-size: 1.1em;
+        }
+        
+        .specialist-map-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        
+        .map-link-btn {
+            flex: 1;
+            min-width: 180px;
+            padding: 15px 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 0.95em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            text-align: center;
+            display: inline-block;
+        }
+        
+        .map-link-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+        }
+        
+        /* Top Predictions */
+        .predictions-list {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+        }
+        
+        .prediction-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px;
+            background: #f5f5f5;
+            border-radius: 6px;
+            margin-bottom: 8px;
+            font-size: 0.95em;
+        }
+        
+        .prediction-item:last-child {
+            margin-bottom: 0;
+        }
+        
+        .prediction-name {
+            color: #333;
+            font-weight: 600;
+        }
+        
+        .prediction-prob {
+            background: #667eea;
+            color: white;
+            padding: 4px 12px;
+            border-radius: 15px;
+            font-size: 0.85em;
+            font-weight: 600;
+        }
+        
+        /* Loading Spinner */
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 40px 20px;
+        }
+        
+        .loading.show {
+            display: block;
+        }
+        
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        /* Error Message */
+        .error-message {
+            display: none;
+            padding: 15px 20px;
+            background: #fee;
+            border: 1px solid #f88;
+            border-radius: 8px;
+            color: #c33;
+            margin-bottom: 20px;
+            animation: slideUp 0.3s ease;
+        }
+        
+        .error-message.show {
+            display: block;
+        }
+        
+        /* Info Message */
+        .info-message {
+            padding: 15px 20px;
+            background: #e3f2fd;
+            border: 1px solid #90caf9;
+            border-radius: 8px;
+            color: #1976d2;
+            margin-top: 20px;
+            font-size: 0.95em;
+        }
+        
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 2em;
+            }
+            
+            .card {
+                padding: 20px;
+            }
+            
+            #map {
+                height: 300px;
+            }
+            
+            .input-mode-tabs {
+                flex-wrap: wrap;
+            }
+        }
+    </style>
+<script src="{{ url_for('static', filename='js/language.js') }}"></script>
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='theme.css') }}">
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <h1>MediFlow</h1>
+            <p>Describe your symptoms and find the right specialist</p>
+        </div>
+        
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Left: Symptom Input -->
+            <div class="card">
+                <h2>💬 Describe Your Symptoms</h2>
+                
+                <div class="error-message" id="errorMessage"></div>
+                
+                <!-- Input Mode Tabs -->
+                <div class="input-mode-tabs">
+                    <button class="tab-btn active" onclick="switchInputMode('select')">📋 Select Symptoms</button>
+                    <button class="tab-btn" onclick="switchInputMode('describe')">📝 Describe in Words</button>
+                </div>
+                
+                <!-- Mode 1: Select Symptoms -->
+                <div id="selectMode" class="input-mode active">
+                    <div class="search-container">
+                        <input 
+                            type="text" 
+                            id="symptomSearch" 
+                            class="search-box" 
+                            placeholder="Type your symptoms (e.g., headache, fever, cough)..."
+                            autocomplete="off"
+                        >
+                        <div class="autocomplete-list" id="autocompleteList"></div>
+                    </div>
+                    
+                    <div class="selected-symptoms" id="selectedSymptomsContainer">
+                        <p class="no-symptoms">No symptoms selected yet</p>
+                    </div>
+                    
+                    <div class="button-group">
+                        <button class="btn-primary" id="predictBtn" onclick="predictDisease()" disabled>
+                            🔍 Check Disease
+                        </button>
+                        <button class="btn-secondary" onclick="clearAll()">Clear All</button>
+                    </div>
+                    
+                    <div class="info-message">
+                        💡 <strong>Tip:</strong> Type each symptom and press Enter or click to add. You can add multiple symptoms for better accuracy.
+                    </div>
+                </div>
+                
+                <!-- Mode 2: Natural Language Description -->
+                <div id="describeMode" class="input-mode">
+                    <div class="search-container">
+                        <textarea 
+                            id="naturalLanguageInput" 
+                            class="search-box search-box-large" 
+                            placeholder="Describe how you're feeling and what symptoms you're experiencing. Example: I have a severe headache, I'm feeling dizzy and nauseous, and I've had a fever for 2 days..."
+                        ></textarea>
+                    </div>
+                    
+                    <div id="detectedSymptomsContainer" style="display: none;" class="detected-symptoms-info">
+                        <h4>✅ Detected Symptoms:</h4>
+                        <div id="detectedSymptomsList"></div>
+                    </div>
+                    
+                    <div class="button-group">
+                        <button class="btn-primary" id="analyzeBtn" onclick="analyzeNaturalLanguage()">
+                            🔍 Analyze & Check
+                        </button>
+                        <button class="btn-secondary" onclick="clearDescribeMode()">Clear</button>
+                    </div>
+                    
+                    <div class="info-message">
+                        💡 <strong>Tip:</strong> Write naturally as if talking to a doctor. The system will detect symptoms and find possible conditions. Be as descriptive as possible for better results.
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Right: Results Preview -->
+            <div class="card">
+                <h2>📊 Results</h2>
+                
+                <div class="loading" id="loading">
+                    <div class="spinner"></div>
+                    <p>Analyzing your symptoms...</p>
+                </div>
+                
+                <div id="resultsPreview" style="display:none;">
+                    <div class="disease-prediction">
+                        <div>
+                            <div class="disease-name" id="diseaseName">-</div>
+                            <p style="color: #666; font-size: 0.95em; margin-top: 10px;">Based on your symptoms</p>
+                        </div>
+                    </div>
+                    
+                    <!-- Other Possible Conditions -->
+                    <div style="margin-top: 30px;">
+                        <h3 style="color: #667eea; margin-bottom: 15px; font-size: 1.1em;">🔝 Other Possible Conditions</h3>
+                        <div class="predictions-list" id="topPredictionsList">-</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Full Results Section -->
+        <div class="results-section" id="fullResults">
+            <!-- Suggestions & Advice Section -->
+            <div class="card">
+                <div style="background: white; padding: 20px; border-radius: 10px;">
+                    <h3 style="color: #667eea; margin-bottom: 15px; font-size: 1.1em;">💡 Suggestions & Advice</h3>
+                    <div id="suggestionsAdviceList" style="display: flex; flex-direction: column; gap: 15px;">
+                        <!-- Suggestions will be generated here -->
+                    </div>
+                </div>
+            </div>
+            
+            <!-- (Recommended Specialists card removed - keeping map & suggestions only) -->
+            
+            <!-- Map Section -->
+            <div class="card">
+                <div class="map-section">
+                    <h3>📍 Find Specialists Near You</h3>
+                    <p style="color: #666; margin-bottom: 20px;">Click below to search for recommended specialists in nearby hospitals:</p>
+                    <div class="specialist-map-buttons" id="specialistMapButtons">
+                        <!-- Buttons will be generated here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Global variables
+        // ==================== LANGUAGE TRANSLATION ====================
+
+    const homeTranslations = {
+        "Describe your symptoms and find the right specialist":
+            "আপনার উপসর্গ বর্ণনা করুন এবং সঠিক বিশেষজ্ঞ খুঁজুন",
+
+        "💬 Describe Your Symptoms":
+            "💬 আপনার উপসর্গ বর্ণনা করুন",
+
+        "📋 Select Symptoms":
+            "📋 উপসর্গ নির্বাচন করুন",
+
+        "📝 Describe in Words":
+            "📝 কথায় বর্ণনা করুন",
+
+        "Type your symptoms (e.g., headache, fever, cough)...":
+            "আপনার উপসর্গ লিখুন (যেমন: মাথাব্যথা, জ্বর, কাশি)...",
+
+        "No symptoms selected yet":
+            "এখনও কোনো উপসর্গ নির্বাচন করা হয়নি",
+
+        "🔍 Check Disease":
+            "🔍 রোগ পরীক্ষা করুন",
+
+        "Clear All":
+            "সব মুছে ফেলুন",
+
+        "💡 Tip:":
+            "💡 টিপস:",
+
+        "Type each symptom and press Enter or click to add. You can add multiple symptoms for better accuracy.":
+            "প্রতিটি উপসর্গ লিখে Enter চাপুন অথবা ক্লিক করে যোগ করুন। আরও নির্ভুল ফলাফলের জন্য একাধিক উপসর্গ যোগ করতে পারেন।",
+
+        "Describe how you're feeling and what symptoms you're experiencing. Example: I have a severe headache, I'm feeling dizzy and nauseous, and I've had a fever for 2 days...":
+            "আপনি কেমন অনুভব করছেন এবং কী কী উপসর্গ হচ্ছে তা বর্ণনা করুন। উদাহরণ: আমার প্রচণ্ড মাথাব্যথা হচ্ছে, মাথা ঘুরছে এবং বমি বমি ভাব হচ্ছে, আর ২ দিন ধরে জ্বর আছে...",
+
+        "✅ Detected Symptoms:":
+            "✅ শনাক্ত হওয়া উপসর্গ:",
+
+        "🔍 Analyze & Check":
+            "🔍 বিশ্লেষণ ও পরীক্ষা করুন",
+
+        "Write naturally as if talking to a doctor. The system will detect symptoms and find possible conditions. Be as descriptive as possible for better results.":
+            "ডাক্তারের সঙ্গে কথা বলার মতো স্বাভাবিকভাবে লিখুন। সিস্টেম আপনার উপসর্গ শনাক্ত করে সম্ভাব্য রোগ খুঁজে বের করবে। ভালো ফলাফলের জন্য যতটা সম্ভব বিস্তারিত লিখুন।",
+
+        "📊 Results":
+            "📊 ফলাফল",
+
+        "Analyzing your symptoms...":
+            "আপনার উপসর্গ বিশ্লেষণ করা হচ্ছে...",
+
+        "Based on your symptoms":
+            "আপনার উপসর্গের ভিত্তিতে",
+
+        "🔝 Other Possible Conditions":
+            "🔝 অন্যান্য সম্ভাব্য রোগ",
+
+        "💡 Suggestions & Advice":
+            "💡 পরামর্শ ও নির্দেশনা",
+
+        "📍 Find Specialists Near You":
+            "📍 আপনার কাছাকাছি বিশেষজ্ঞ খুঁজুন",
+
+        "Click below to search for recommended specialists in nearby hospitals:":
+            "কাছাকাছি হাসপাতালের সুপারিশকৃত বিশেষজ্ঞ খুঁজতে নিচে ক্লিক করুন:",
+
+        "No specialists found":
+            "কোনো বিশেষজ্ঞ পাওয়া যায়নি",
+
+        "No predictions available":
+            "কোনো পূর্বাভাস পাওয়া যায়নি",
+
+        "No suggestions available":
+            "কোনো পরামর্শ পাওয়া যায়নি",
+
+        "Recommended Specialist:":
+            "সুপারিশকৃত বিশেষজ্ঞ:",
+
+        "Urgency Level:":
+            "জরুরিতার মাত্রা:",
+
+        "Matching Symptoms:":
+            "মিলে যাওয়া উপসর্গ:",
+
+        "Recommended Precautions:":
+            "সুপারিশকৃত সতর্কতা:",
+
+        "Select Symptoms":
+            "উপসর্গ নির্বাচন করুন",
+
+        "Describe in Words":
+            "কথায় বর্ণনা করুন",
+
+        "Check Disease":
+            "রোগ পরীক্ষা করুন",
+
+        "Clear":
+            "মুছে ফেলুন",
+
+        "Analysis Complete":
+            "বিশ্লেষণ সম্পন্ন",
+
+        "Good News!":
+            "সুসংবাদ!",
+
+        "Recommended Care:":
+            "সুপারিশকৃত করণীয়:",
+
+        "For a Better Diagnosis, Please:":
+            "আরও ভালো রোগ নির্ণয়ের জন্য:",
+
+        "Note:":
+            "নোট:"
+    };
+
+
+    function translateHomePage() {
+
+        const language =
+            localStorage.getItem("mediflow_language");
+
+        if (language !== "Bangla") {
+            return;
+        }
+
+        // Translate normal text
+        const walker = document.createTreeWalker(
+            document.body,
+            NodeFilter.SHOW_TEXT
+        );
+
+        const textNodes = [];
+
+        while (walker.nextNode()) {
+            textNodes.push(walker.currentNode);
+        }
+
+        textNodes.forEach(node => {
+
+            const original = node.nodeValue.trim();
+
+            if (homeTranslations[original]) {
+                node.nodeValue =
+                    node.nodeValue.replace(
+                        original,
+                        homeTranslations[original]
+                    );
+            }
+
+        });
+
+        // Translate placeholders
+        document.querySelectorAll("input, textarea").forEach(element => {
+
+            const placeholder = element.getAttribute("placeholder");
+
+            if (placeholder && homeTranslations[placeholder]) {
+                element.setAttribute(
+                    "placeholder",
+                    homeTranslations[placeholder]
+                );
+            }
+
+        });
+        }
+        let selectedSymptoms = new Set();
+        let allSymptoms = [];
+        let currentDiseases = [];
+        let currentSpecialists = [];
+        let currentInputMode = 'select';
+        
+       // Initialize on page load
+      async function init() {
+         await loadSymptoms();
+         translateHomePage();
+          }
+        
+        // Switch input mode
+        function switchInputMode(mode) {
+            currentInputMode = mode;
+            
+            // Update tabs
+            const tabs = document.querySelectorAll('.tab-btn');
+            tabs.forEach(tab => tab.classList.remove('active'));
+            event.target.classList.add('active');
+            
+            // Update modes
+            document.getElementById('selectMode').classList.remove('active');
+            document.getElementById('describeMode').classList.remove('active');
+            
+            if (mode === 'select') {
+                document.getElementById('selectMode').classList.add('active');
+            } else {
+                document.getElementById('describeMode').classList.add('active');
+            }
+            
+            hideError();
+        }
+        
+        // Load all available symptoms
+        async function loadSymptoms() {
+            try {
+                const response = await fetch('/api/symptoms');
+                const data = await response.json();
+                allSymptoms = data.symptoms;
+                console.log(`Loaded ${allSymptoms.length} symptoms`);
+            } catch (error) {
+                console.error('Error loading symptoms:', error);
+                showError('Failed to load symptoms. Please refresh the page.');
+            }
+        }
+        
+        // ==================== SELECT MODE FUNCTIONS ====================
+        
+        // Search box input event
+        document.getElementById('symptomSearch')?.addEventListener('input', function(e) {
+            const query = e.target.value.trim();
+            const autocompleteList = document.getElementById('autocompleteList');
+            
+            if (query.length < 2) {
+                autocompleteList.classList.remove('show');
+                return;
+            }
+            
+            // Filter symptoms and sort alphabetically
+            const matches = allSymptoms.filter(s => {
+                const en = s.toLowerCase();
+                const bn = typeof mediflowSymptomLabel === "function" ? mediflowSymptomLabel(s).toLowerCase() : en;
+                return en.includes(query.toLowerCase()) || bn.includes(query.toLowerCase());
+            }).sort((a, b) => a.toLowerCase().localeCompare(b.toLowerCase())).slice(0, 10);
+            
+            if (matches.length === 0) {
+                autocompleteList.classList.remove('show');
+                return;
+            }
+            
+            // Display matches in alphabetical order
+            autocompleteList.innerHTML = matches.map(symptom => `
+                <div class="autocomplete-item" onclick="addSymptom('${symptom}')">${typeof mediflowSymptomLabel === "function" ? mediflowSymptomLabel(symptom) : symptom}</div>
+            `).join('');
+            
+            autocompleteList.scrollTop = 0;
+            autocompleteList.classList.add('show');
+        });
+        
+        // Enter key support
+        document.getElementById('symptomSearch')?.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                const query = this.value.trim();
+                if (query) {
+                    addSymptom(query);
+                    this.value = '';
+                    document.getElementById('autocompleteList').classList.remove('show');
+                }
+            }
+        });
+        
+        // Click outside to close autocomplete
+        document.addEventListener('click', function(e) {
+            if (!e.target.closest('.search-container')) {
+                const autocompleteList = document.getElementById('autocompleteList');
+                if (autocompleteList) {
+                    autocompleteList.classList.remove('show');
+                }
+            }
+        });
+        
+        // Add symptom to selection
+        function addSymptom(symptom) {
+            const autocompleteList = document.getElementById('autocompleteList');
+            autocompleteList.classList.remove('show');
+
+            const normalized = symptom.toLowerCase().trim();
+            
+            // Resolve either the English internal symptom or its Bangla display name.
+            const exactMatch = typeof mediflowResolveSymptomInput === "function"
+                ? mediflowResolveSymptomInput(symptom, allSymptoms)
+                : allSymptoms.find(s => s.toLowerCase() === normalized);
+            
+            if (exactMatch && !selectedSymptoms.has(exactMatch)) {
+                selectedSymptoms.add(exactMatch);
+                updateSelectedSymptomsDisplay();
+                document.getElementById('predictBtn').disabled = false;
+                document.getElementById('symptomSearch').value = '';
+            } else if (exactMatch) {
+                showError('This symptom is already selected!');
+            } else {
+                showError(`"${symptom}" is not recognized. Try another symptom.`);
+            }
+        }
+        
+        // Update selected symptoms display
+        function updateSelectedSymptomsDisplay() {
+            const container = document.getElementById('selectedSymptomsContainer');
+            
+            if (selectedSymptoms.size === 0) {
+                container.innerHTML = '<p class="no-symptoms">No symptoms selected yet</p>';
+                return;
+            }
+            
+            const tags = Array.from(selectedSymptoms).map(symptom => `
+                <span class="symptom-tag">
+                    ${typeof mediflowSymptomLabel === "function" ? mediflowSymptomLabel(symptom) : symptom}
+                    <span class="remove" onclick="removeSymptom('${symptom}')">×</span>
+                </span>
+            `).join('');
+            
+            container.innerHTML = tags;
+        }
+        
+        // Remove symptom
+        function removeSymptom(symptom) {
+            selectedSymptoms.delete(symptom);
+            updateSelectedSymptomsDisplay();
+            if (selectedSymptoms.size === 0) {
+                document.getElementById('predictBtn').disabled = true;
+            }
+        }
+        
+        // Clear all
+        function clearAll() {
+            selectedSymptoms.clear();
+            document.getElementById('symptomSearch').value = '';
+            document.getElementById('predictBtn').disabled = true;
+            updateSelectedSymptomsDisplay();
+            document.getElementById('resultsPreview').style.display = 'none';
+            document.getElementById('fullResults').classList.remove('show');
+            hideError();
+        }
+        
+        // Predict disease from selected symptoms
+        async function predictDisease() {
+            if (selectedSymptoms.size === 0) {
+                showError('Please select at least one symptom before submitting.');
+                return;
+            }
+            
+            // Show loading
+            document.getElementById('loading').classList.add('show');
+            document.getElementById('resultsPreview').style.display = 'none';
+            hideError();
+            
+            try {
+                // Build symptoms dict
+                const symptoms = {};
+                allSymptoms.forEach(s => {
+                    symptoms[s] = selectedSymptoms.has(s) ? 1 : 0;
+                });
+                
+                const response = await fetch('/predict', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ symptoms: symptoms })
+                });
+                
+                const data = await response.json();
+                
+                if (data.low_confidence) {
+                    // Handle low confidence response
+                    displayLowConfidenceResults(data);
+                } else if (data.success) {
+                    displayResults(data);
+                    currentSpecialists = data.recommended_specialists;
+                    currentDiseases = [data.predicted_disease];
+                } else {
+                    showError(data.error || 'Prediction failed');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                showError('Error communicating with server: ' + error.message);
+            } finally {
+                document.getElementById('loading').classList.remove('show');
+            }
+        }
+        
+        // ==================== NATURAL LANGUAGE MODE FUNCTIONS ====================
+        
+        // Analyze natural language input
+        async function analyzeNaturalLanguage() {
+            const text = document.getElementById('naturalLanguageInput').value.trim();
+            
+            if (!text) {
+                showError('Please describe your symptoms');
+                return;
+            }
+            
+            // Show loading
+            document.getElementById('loading').classList.add('show');
+            document.getElementById('resultsPreview').style.display = 'none';
+            document.getElementById('detectedSymptomsContainer').style.display = 'none';
+            hideError();
+            
+            try {
+                const response = await fetch('/search_predict', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ 
+                        text: text,
+                        fuzzy_threshold: 0.65
+                    })
+                });
+            
+                const data = await response.json();
+                
+                if (data.low_confidence) {
+                    // Handle low confidence response
+                    displayLowConfidenceResults(data);
+                } else if (data.success) {
+                    // Show detected symptoms
+                    displayDetectedSymptoms(data.detected_symptoms);
+                    // Display results
+                    displayResults(data);
+                    currentSpecialists = data.recommended_specialists;
+                    currentDiseases = [data.predicted_disease];
+                } else {
+                    showError(data.error || 'Could not analyze symptoms');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                showError('Error communicating with server: ' + error.message);
+            } finally {
+                document.getElementById('loading').classList.remove('show');
+            }
+        }
+        
+        // Display detected symptoms
+        function displayDetectedSymptoms(symptoms) {
+            const container = document.getElementById('detectedSymptomsContainer');
+            const list = document.getElementById('detectedSymptomsList');
+            
+            if (symptoms && symptoms.length > 0) {
+                const tags = symptoms.map(s => `
+                    <span class="symptom-tag detected">${s}</span>
+                `).join('');
+                list.innerHTML = tags;
+                container.style.display = 'block';
+            }
+        }
+        
+        // Clear describe mode
+        function clearDescribeMode() {
+            document.getElementById('naturalLanguageInput').value = '';
+            document.getElementById('detectedSymptomsContainer').style.display = 'none';
+            document.getElementById('resultsPreview').style.display = 'none';
+            document.getElementById('fullResults').classList.remove('show');
+            hideError();
+        }
+        
+        // ==================== COMMON FUNCTIONS ====================
+        
+        // Display results
+        function displayLowConfidenceResults(data) {
+            // Show low confidence message
+            document.getElementById('diseaseName').textContent = 'Analysis Complete';
+            document.getElementById('resultsPreview').style.display = 'block';
+            
+            // Clear Google Maps buttons
+            const mapButtonsContainer = document.getElementById('specialistMapButtons');
+            mapButtonsContainer.innerHTML = '';
+            
+            // Clear top predictions list
+            const topPredictionsList = document.getElementById('topPredictionsList');
+            topPredictionsList.innerHTML = '';
+            
+            // Display reassurance and recommendations
+            const suggestionsAdviceList = document.getElementById('suggestionsAdviceList');
+            const reassurance = data.reassurance || {};
+            const nextSteps = data.next_steps || [];
+            const recommendations = reassurance.recommendations || [];
+            
+            let html = `
+                <div style="background: #e8f7ee; border: 2px solid #1d6a3f; border-radius: 10px; padding: 20px; margin-bottom: 15px;">
+                    <h3 style="margin: 0 0 10px 0; color: #1d6a3f; font-size: 1.2em;">✓ ${reassurance.title || 'Good News!'}</h3>
+                    <p style="margin: 0; color: #1d6a3f; font-size: 0.95em;">${reassurance.message || 'Based on your symptoms, it does not appear to be a serious condition.'}</p>
+                </div>
+            `;
+            
+            if (recommendations.length > 0) {
+                html += `
+                    <div style="background: #f8fafc; border: 1px solid #dde6f0; border-radius: 10px; padding: 15px; margin-bottom: 15px;">
+                        <h4 style="margin: 0 0 12px 0; color: #333;">Recommended Care:</h4>
+                        <div style="font-size: 0.95em; line-height: 1.8; color: #555;">
+                `;
+                recommendations.forEach(rec => {
+                    html += `<p style="margin: 6px 0;">${rec}</p>`;
+                });
+                if (reassurance.note) {
+                    html += `<p style="margin-top: 12px; font-style: italic; color: #666;"><strong>Note:</strong> ${reassurance.note}</p>`;
+                }
+                html += `
+                        </div>
+                    </div>
+                `;
+            }
+            
+            if (nextSteps.length > 0) {
+                html += `
+                    <div style="background: #f8fafc; border: 1px solid #dde6f0; border-radius: 10px; padding: 15px;">
+                        <h4 style="margin: 0 0 12px 0; color: #333;">For a Better Diagnosis, Please:</h4>
+                        <div style="font-size: 0.95em; line-height: 1.8; color: #555;">
+                `;
+                nextSteps.forEach((step, index) => {
+                    html += `<p style="margin: 6px 0;"><strong>${index + 1}.</strong> ${step}</p>`;
+                });
+                html += `
+                        </div>
+                    </div>
+                `;
+            }
+            
+            suggestionsAdviceList.innerHTML = html;
+            
+            // Show full results
+            document.getElementById('fullResults').classList.add('show');
+        }
+        
+        // Display results function
+        function displayResults(data) {
+            // Disease name
+            document.getElementById('diseaseName').textContent = data.predicted_disease || 'Unknown';
+            
+            document.getElementById('resultsPreview').style.display = 'block';
+            
+            // Generate Google Maps buttons for each specialist from API
+            const mapButtonsContainer = document.getElementById('specialistMapButtons');
+            const specialists = data.recommended_specialists || [];
+            if (specialists.length > 0) {
+                mapButtonsContainer.innerHTML = specialists.map(spec => `
+                    <a href="/find_specialists?specialist=${encodeURIComponent(spec)}" class="map-link-btn">
+                        🗺️ Find ${spec}
+                    </a>
+                `).join('');
+            } else {
+                mapButtonsContainer.innerHTML = '<p style="color: #999;">No specialists found</p>';
+            }
+            
+            // Top predictions (Other Possible Conditions)
+            const topPredictionsList = document.getElementById('topPredictionsList');
+            const predictions = data.top_predictions || data.predictions || [];
+            if (predictions && predictions.length > 0) {
+                topPredictionsList.innerHTML = predictions.map((pred, idx) => `
+                    <div class="prediction-item" style="background: ${idx === 0 ? '#e3f2fd' : '#f5f5f5'};">
+                        <span class="prediction-name" style="color: ${idx === 0 ? '#1976d2' : '#333'};${idx === 0 ? 'font-weight: bold;' : ''}">${pred.disease}</span>
+                        <span class="prediction-prob" style="background: ${idx === 0 ? '#1976d2' : '#667eea'};">${pred.confidence_percentage || (pred.probability ? (pred.probability * 100).toFixed(1) + '%' : 'N/A')}</span>
+                    </div>
+                `).join('');
+            } else {
+                topPredictionsList.innerHTML = '<p style="color: #999;">No predictions available</p>';
+            }
+            
+            // Suggestions & Advice - Main disease details
+            const suggestionsAdviceList = document.getElementById('suggestionsAdviceList');
+            const topPrediction = predictions && predictions.length > 0 ? predictions[0] : null;
+            
+            if (topPrediction) {
+                const confidence = topPrediction.confidence_percentage || 
+                    (topPrediction.confidence ? `${(topPrediction.confidence * 100).toFixed(1)}%` : 
+                    (topPrediction.probability ? `${(topPrediction.probability * 100).toFixed(1)}%` : 'N/A'));
+                const specialist = topPrediction.specialist || 'General Practitioner';
+                const urgency = topPrediction.urgency || 'Medium';
+                const precautions = Array.isArray(topPrediction.precautions) ? 
+                    topPrediction.precautions.join(' • ') : 
+                    (topPrediction.precautions || 'Consult with a healthcare professional');
+                const matchingSymptoms = Array.isArray(topPrediction.matching_symptoms) ?
+                    topPrediction.matching_symptoms.join(', ') :
+                    'N/A';
+                
+                const urgencyColor = urgency === 'High' ? '#d32f2f' : (urgency === 'Medium' ? '#f57c00' : '#388e3c');
+                const urgencyBg = urgency === 'High' ? '#ffebee' : (urgency === 'Medium' ? '#fff3e0' : '#e8f5e9');
+                
+                suggestionsAdviceList.innerHTML = `
+                    <div style="background: #f8fafc; border: 1px solid #dde6f0; border-radius: 10px; padding: 20px;">
+                        <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 15px;">
+                            <h4 style="margin: 0; color: #333; font-size: 1.2em;">${topPrediction.disease}</h4>
+                            <span style="background: #667eea; color: white; padding: 8px 15px; border-radius: 15px; font-size: 0.9em; font-weight: 700;">${confidence}</span>
+                        </div>
+                        
+                        <div style="font-size: 0.95em; line-height: 1.7; color: #555;">
+                            <p style="margin: 10px 0;"><strong>👨‍⚕️ Recommended Specialist:</strong> ${specialist}</p>
+                            <p style="margin: 10px 0; padding: 10px; background: ${urgencyBg}; border-left: 3px solid ${urgencyColor}; border-radius: 4px;">
+                                <strong>⚠️ Urgency Level:</strong> <span style="color: ${urgencyColor}; font-weight: bold;">${urgency}</span>
+                            </p>
+                            <p style="margin: 10px 0;"><strong>🩺 Matching Symptoms:</strong> ${matchingSymptoms}</p>
+                            <p style="margin: 10px 0;"><strong>💊 Recommended Precautions:</strong></p>
+                            <div style="background: #fafafa; padding: 10px 15px; border-radius: 6px; margin-top: 8px;">
+                                ${precautions.split(' • ').map(p => `<div style="margin: 5px 0;">• ${p.trim()}</div>`).join('')}
+                            </div>
+                        </div>
+                    </div>
+                `;
+            } else {
+                suggestionsAdviceList.innerHTML = '<p style="color: #999;">No suggestions available</p>';
+            }
+            
+            // Show full results
+            document.getElementById('fullResults').classList.add('show');
+        }
+        
+        // Open Google Maps for specialist search
+        function openGoogleMaps(specialist) {
+            // Kept for backwards compatibility with existing markup.
+            // Navigation now stays inside MediFlow.
+            window.location.href = `/find_specialists?specialist=${encodeURIComponent(specialist || '')}`;
+        }
+        
+        // Initialize Google Map
+        function initMap() {
+            // Map functionality removed - using Google Maps links instead
+        }
+        
+        // Error handling
+        function showError(message) {
+            const errorDiv = document.getElementById('errorMessage');
+            errorDiv.textContent = message;
+            errorDiv.classList.add('show');
+        }
+        
+        function hideError() {
+     const errorDiv = document.getElementById('errorMessage');
+     errorDiv.classList.remove('show');
+     }
+
+     // Initialize
+     init();
+
+ window.addEventListener("mediflow:languageChanged", () => {
+    try { updateSelectedSymptomsDisplay(); } catch (e) {}
+    try {
+        const q = document.getElementById("symptomSearch")?.value || "";
+        if (q.length >= 2) document.getElementById("symptomSearch")?.dispatchEvent(new Event("input"));
+    } catch (e) {}
+});
+</script>
+ </body>
+ </html>
+

@@ -1,0 +1,2688 @@
+<!DOCTYPE html>  <html lang="en">  <head>  <meta charset="UTF-8">  
+
+<meta  
+    name="viewport"  
+    content="width=device-width, initial-scale=1.0"  
+>  
+
+<title>MediFlow - Symptom Checker</title>  
+
+<link  
+    rel="stylesheet"  
+    href="{{ url_for('static', filename='style.css') }}"  
+>
+
+<script src="{{ url_for('static', filename='js/language.js') }}"></script>
+
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='theme.css') }}">
+</head>  <body>  <div class="app">  <!-- ================= SIDEBAR ================= -->  
+
+<aside class="sidebar">  
+
+    <div class="logo">  
+
+        <div class="logo-icon">  
+            +  
+        </div>  
+
+        <div class="logo-text">  
+            MediFlow  
+        </div>  
+
+    </div>  
+
+
+    <nav class="nav">  
+
+        <a  
+         href="/"  
+         class="nav-item"  
+        >  
+         <span class="nav-icon" aria-hidden="true">🏠</span>  
+
+           <span>  
+            Home  
+            </span>  
+         </a>  
+
+
+        <a  
+            href="{{ url_for('symptom_checker') }}"  
+            class="nav-item active"  
+        >  
+
+            <span class="nav-icon" aria-hidden="true">🩺</span>  
+
+            <span>  
+                Symptom Checker  
+            </span>  
+
+        </a>  
+
+
+        <a href="{{ url_for('skin_disease_analysis') }}" class="nav-item">
+            <span class="nav-icon">🧴</span>
+            <span data-i18n="Skin Disease Analysis">Skin Disease Analysis</span>
+        </a>
+
+
+        <a  
+            href="{{ url_for('health_library') }}"  
+            class="nav-item"  
+        >  
+
+            <span class="nav-icon" aria-hidden="true">📚</span>  
+
+            <span>  
+                Health Library  
+            </span>  
+
+        </a>  
+
+
+        <a  
+            href="{{ url_for('saved_results') }}"  
+            class="nav-item"  
+        >  
+
+            <span class="nav-icon" aria-hidden="true">⭐</span>  
+
+            <span>  
+                Saved Results  
+            </span>  
+
+        </a>  
+
+
+        <a  
+            href="{{ url_for('settings') }}"  
+            class="nav-item"  
+        >  
+
+            <span class="nav-icon" aria-hidden="true">⚙️</span>  
+
+            <span>  
+                Settings  
+            </span>  
+
+        </a>  
+
+    </nav>  
+
+
+    <div class="sidebar-bottom">  
+
+        <div class="health-icon">  
+            ♡  
+        </div>  
+
+        <strong>  
+            Better Health  
+        </strong>  
+
+        <br>  
+
+        Brighter Tomorrow  
+
+    </div>  
+
+</aside>  
+
+
+<!-- ================= MAIN ================= -->  
+
+<main class="main">  
+
+
+    <!-- ================= TOP BAR ================= -->  
+
+    <div class="topbar">  
+
+        <div class="search-box">  
+
+            <span>  
+                ⌕  
+            </span>  
+
+            <input  
+                type="text"  
+                placeholder="Search symptoms, diseases or specialists..."  
+                disabled  
+            >  
+
+        </div>  
+
+
+        <div class="user-area">  
+
+            <div class="notification">  
+                ♧  
+            </div>  
+
+
+            <a class="user" href="{{ url_for('profile') }}" id="globalProfileLink" style="text-decoration:none;color:inherit;cursor:pointer;">  
+
+                <div class="avatar" id="globalUserAvatar">  
+                    MF  
+                </div>  
+
+                <div class="user-name" id="globalUserName">  
+                    MediFlow User  
+                </div>  
+
+            </a>  
+
+        </div>  
+
+    </div>  
+
+
+    <!-- ================= CONTENT ================= -->  
+
+    <div class="content">  
+
+
+        <!-- ================= HERO ================= -->  
+
+        <div class="hero">  
+
+            <div>  
+
+                <h1>  
+                    Your Health, Our Priority  
+                </h1>  
+
+                <p>  
+                    Describe your symptoms and find the right specialist with AI assistance.  
+                </p>  
+
+            </div>  
+
+
+            <div class="hero-badge">  
+
+                ✦ AI-Powered Healthcare Guidance  
+
+            </div>  
+
+        </div>  
+
+
+        <!-- ================= TOP GRID ================= -->  
+
+        <div class="dashboard-grid">  
+
+
+            <!-- ================= SYMPTOM INPUT ================= -->  
+
+            <section  
+                class="card"  
+                id="symptom-section"  
+            >  
+
+
+                <div class="card-title">  
+
+                    <div class="card-title-icon">  
+                        ▤  
+                    </div>  
+
+                    Describe Your Symptoms  
+
+                </div>  
+
+
+                <!-- ================= INPUT TABS ================= -->  
+
+                <div class="input-tabs">  
+
+
+                    <!-- TYPE SYMPTOMS -->  
+
+                    <button  
+                        class="input-tab active"  
+                        type="button"  
+                        onclick="switchInputMode('type', this)"  
+                    >  
+
+                        ⌨ Type Symptoms  
+
+                    </button>  
+
+
+                    <!-- SELECT SYMPTOMS -->  
+
+                    <button  
+                        class="input-tab"  
+                        type="button"  
+                        onclick="switchInputMode('select', this)"  
+                    >  
+
+                        ☷ Select Symptoms  
+
+                    </button>  
+
+
+                </div>  
+
+
+                <!-- =================================================  
+                     TYPE SYMPTOMS  
+                     ================================================= -->  
+
+                <div  
+                    id="typeSymptomsPanel"  
+                    class="voice-input-wrapper"  
+                >  
+
+
+                    <textarea  
+                        id="symptomInput"  
+                        data-i18n-placeholder="Type your symptoms here (e.g., headache, fever, cough)..."
+                        placeholder="Type your symptoms here (e.g., headache, fever, cough)..."  
+                    ></textarea>  
+
+
+                    <!-- VOICE BUTTON -->  
+
+                    <button  
+                        type="button"  
+                        id="voiceBtn"  
+                        onclick="startVoiceInput()"  
+                        data-i18n-title="Voice Input"
+                        title="Voice Input"  
+                    >  
+
+                        🎙️  
+
+                    </button>  
+
+
+                </div>  
+
+
+                <!-- =================================================  
+                     SELECT SYMPTOMS  
+                     ================================================= -->  
+
+                <div  
+                    id="selectSymptomsPanel"  
+                    class="select-symptoms-panel"  
+                    style="display:none;"  
+                >  
+
+
+                    <input  
+                        id="symptomSelectSearch"  
+                        class="select-search"  
+                        type="text"  
+                        placeholder="Search and select symptoms..."  
+                        autocomplete="off"  
+                    >  
+
+
+                    <div  
+                        id="symptomSelectList"  
+                        class="select-symptom-list"  
+                        style="display:none;"  
+                    ></div>  
+
+
+                    <div  
+                        id="selectedSymptomTags"  
+                        class="tag-list selected-symptom-tags"  
+                    ></div>  
+
+
+                </div>  
+
+
+                <!-- =================================================  
+                     DETECTED SYMPTOMS  
+                     ================================================= -->  
+
+                <div  
+                    id="detectedSymptoms"  
+                    class="detected-box"  
+                    style="display:none;"  
+                >  
+
+
+                    <div class="detected-title">  
+
+                        Detected Symptoms  
+
+                    </div>  
+
+
+                    <div  
+                        id="symptomTags"  
+                        class="tag-list"  
+                    ></div>  
+
+
+                </div>  
+
+
+                <!-- ================= BUTTONS ================= -->  
+
+                <div class="button-row">  
+
+
+                    <button  
+                        class="primary-btn"  
+                        id="submitBtn"  
+                        type="button"  
+                        onclick="submitSymptoms()"  
+                    >  
+
+                        ⌕ Check Disease  
+
+                    </button>  
+
+
+                    <button  
+                        class="secondary-btn"  
+                        type="button"  
+                        onclick="clearInput()"  
+                    >  
+
+                        Clear  
+
+                    </button>  
+
+
+                </div>  
+
+
+                <!-- ================= TIP ================= -->  
+
+                <div class="tip">  
+
+                    💡  
+
+                    <strong>  
+                        Tip:  
+                    </strong>  
+
+                    Describe multiple symptoms together  
+                    for better prediction accuracy.  
+
+                </div>  
+
+                <div class="inline-advice">
+                    <div class="card-title">
+                        <div class="card-title-icon">
+                            ✦
+                        </div>
+
+                        Suggestions & Advice
+                    </div>
+
+                    <div id="adviceContent">
+                        <ul class="advice-list">
+                            <li>Enter your symptoms clearly.</li>
+                            <li>Include multiple symptoms when possible.</li>
+                            <li>Review the predicted conditions carefully.</li>
+                            <li>Consult a qualified healthcare professional for medical decisions.</li>
+                        </ul>
+                    </div>
+                </div>
+
+
+                <!-- ================= LOADING ================= -->  
+
+                <div  
+                    id="loading"  
+                    class="loading"  
+                    style="display:none;"  
+                >  
+
+                    <div class="spinner"></div>  
+
+                    Analyzing your symptoms...  
+
+                </div>  
+
+
+                <!-- ================= MESSAGE ================= -->  
+
+                <div id="message"></div>  
+
+
+            </section>  
+
+
+            <!-- =====================================================  
+                 RESULTS  
+                 ===================================================== -->  
+
+            <section  
+                class="card results-card"  
+            >  
+
+
+                <div class="card-title">  
+
+                    <div class="card-title-icon">  
+                        ▥  
+                    </div>  
+
+                    Results  
+
+                </div>  
+
+
+                <div  
+                    id="results"  
+                    class="empty-results"  
+                >  
+
+                    <div>  
+
+                        <div class="empty-icon">  
+                            ✦  
+                        </div>  
+
+
+                        <strong>  
+                            Your analysis will appear here  
+                        </strong>  
+
+
+                        <p  
+                            style="margin-top:7px;font-size:12px;"  
+                        >  
+
+                            Enter your symptoms and click  
+                            "Check Disease".  
+
+                        </p>  
+
+                    </div>  
+
+                </div>  
+
+                <div class="result-specialist" id="specialist-section">
+                    <div class="card-title">
+                        <div class="card-title-icon">
+                            ♙
+                        </div>
+
+                        Recommended Specialist
+                    </div>
+
+                    <div id="specialistContent">
+                        <div class="specialist-box">
+                            <div class="specialist-info">
+                                <div class="doctor-avatar">
+                                    ⚕
+                                </div>
+
+                                <div>
+                                    <div class="specialist-name">
+                                        Waiting for analysis
+                                    </div>
+
+                                    <div class="specialist-label">
+                                        Your recommended specialist will appear here.
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+
+            </section>  
+
+
+        </div>  
+
+
+        <!-- ================= DISCLAIMER ================= -->  
+
+        <div class="disclaimer">  
+
+            ⚠  
+
+            <strong>  
+                Medical Disclaimer:  
+            </strong>  
+
+            MediFlow provides informational predictions based on  
+            the available dataset. It is not a substitute for  
+            professional medical diagnosis, treatment, or advice.  
+            Always consult a qualified healthcare professional.  
+
+        </div>  
+
+
+    </div>  
+
+</main>
+
+</div>  <!-- =============================================================  
+     JAVASCRIPT  
+     ============================================================= -->  <script>  
+  
+  
+/* ===============================================================  
+   GLOBAL VARIABLES  
+   =============================================================== */  
+  
+let inputMode = "type";  
+  
+let availableSymptoms = [];  
+  
+const selectedSymptoms = new Set();  
+  
+let recognition = null;  
+  
+window.lastAnalysisData = null;  
+  
+  
+/* ===============================================================  
+   HTML ESCAPE  
+   =============================================================== */  
+  
+function escapeHtml(value) {  
+  
+    if (  
+        value === null ||  
+        value === undefined  
+    ) {  
+  
+        return "";  
+  
+    }  
+  
+  
+    return String(value)  
+  
+        .replace(/&/g, "&amp;")  
+  
+        .replace(/</g, "&lt;")  
+  
+        .replace(/>/g, "&gt;")  
+  
+        .replace(/"/g, "&quot;")  
+  
+        .replace(/'/g, "&#039;");  
+  
+}  
+  
+  
+/* ===============================================================  
+   NORMALIZE PREDICTIONS  
+   =============================================================== */  
+  
+function normalizePredictions(data) {  
+  
+    if (  
+        Array.isArray(data.predictions) &&  
+        data.predictions.length  
+    ) {  
+  
+        return data.predictions;  
+  
+    }  
+  
+  
+    if (  
+        Array.isArray(data.top_predictions) &&  
+        data.top_predictions.length  
+    ) {  
+  
+        return data.top_predictions;  
+  
+    }  
+  
+  
+    return [];  
+  
+}  
+  
+  
+/* ===============================================================  
+   CONFIDENCE  
+   =============================================================== */  
+  
+function formatConfidence(prediction) {  
+  
+    if (  
+        prediction.confidence_percentage  
+    ) {  
+  
+        return prediction.confidence_percentage;  
+  
+    }  
+  
+  
+    if (  
+        prediction.probability !== undefined  
+    ) {  
+  
+        return (  
+            prediction.probability * 100  
+        ).toFixed(1) + "%";  
+  
+    }  
+  
+  
+    if (  
+        prediction.confidence !== undefined  
+    ) {  
+  
+        return (  
+            prediction.confidence * 100  
+        ).toFixed(1) + "%";  
+  
+    }  
+  
+  
+    return "N/A";  
+  
+}  
+  
+  
+/* ===============================================================  
+   PRECAUTIONS  
+   =============================================================== */  
+  
+function formatPrecautions(value) {  
+  
+    if (!value) {  
+  
+        return [];  
+  
+    }  
+  
+  
+    if (Array.isArray(value)) {  
+  
+        return value;  
+  
+    }  
+  
+  
+    return [value];  
+  
+}  
+  
+  
+/* ===============================================================  
+   MESSAGE  
+   =============================================================== */  
+  
+function showMessage(text, type) {  
+  
+    const message =  
+        document.getElementById("message");  
+  
+  
+    if (!message) {  
+  
+        return;  
+  
+    }  
+  
+  
+    message.innerHTML = `  
+  
+        <div class="alert ${type}">  
+            ${escapeHtml(text)}  
+        </div>  
+  
+    `;  
+  
+}  
+  
+  
+function clearMessage() {  
+  
+    const message =  
+        document.getElementById("message");  
+  
+  
+    if (message) {  
+  
+        message.innerHTML = "";  
+  
+    }  
+  
+}  
+  
+  
+/* ===============================================================  
+   LOADING  
+   =============================================================== */  
+  
+function showLoading(active) {  
+  
+    const loading =  
+        document.getElementById("loading");  
+  
+  
+    if (loading) {  
+  
+        loading.style.display =  
+            active ? "block" : "none";  
+  
+    }  
+  
+}  
+  
+  
+/* ===============================================================  
+   VOICE INPUT  
+   =============================================================== */  
+  
+let voiceStarting = false;
+let voicePermissionChecked = false;
+
+function setVoiceButton(state) {
+    const voiceBtn = document.getElementById("voiceBtn");
+    if (!voiceBtn) return;
+    if (state === "listening") {
+        voiceBtn.textContent = "🔴";
+        voiceBtn.disabled = true;
+        voiceBtn.title = "Listening… speak now";
+    } else if (state === "starting") {
+        voiceBtn.textContent = "⏳";
+        voiceBtn.disabled = true;
+        voiceBtn.title = "Starting microphone…";
+    } else {
+        voiceBtn.textContent = "🎙️";
+        voiceBtn.disabled = false;
+        voiceBtn.title = "Voice Input";
+    }
+}
+
+function setupVoiceRecognition() {
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    const voiceBtn = document.getElementById("voiceBtn");
+    window.voiceRecognitionActive = false;
+    voiceStarting = false;
+
+    if (!SpeechRecognition) {
+        recognition = null;
+        if (voiceBtn) voiceBtn.title = "Voice input is not supported. Use the latest Chrome or Edge.";
+        return;
+    }
+
+    recognition = new SpeechRecognition();
+    recognition.continuous = false;
+    recognition.interimResults = false;
+    recognition.maxAlternatives = 1;
+    recognition.lang = typeof getSpeechLanguage === "function" ? getSpeechLanguage() : "en-US";
+
+    recognition.onstart = function () {
+        voiceStarting = false;
+        window.voiceRecognitionActive = true;
+        setVoiceButton("listening");
+    };
+
+    recognition.onresult = function (event) {
+        const input = document.getElementById("symptomInput");
+        if (!input || !event.results || !event.results.length) return;
+        let text = "";
+        for (let i = event.resultIndex || 0; i < event.results.length; i++) {
+            if (event.results[i] && event.results[i][0]) text += " " + event.results[i][0].transcript;
+        }
+        text = text.trim();
+        if (!text) return;
+        input.value = input.value.trim() ? input.value.trim() + " " + text : text;
+        input.dispatchEvent(new Event("input", {bubbles:true}));
+    };
+
+    recognition.onend = function () {
+        voiceStarting = false;
+        window.voiceRecognitionActive = false;
+        setVoiceButton("idle");
+    };
+
+    recognition.onerror = function (event) {
+        voiceStarting = false;
+        window.voiceRecognitionActive = false;
+        setVoiceButton("idle");
+        const messages = {
+            "not-allowed": "Microphone permission is blocked for this site. In Chrome, open the lock/site settings, set Microphone to Allow, then reload once.",
+            "service-not-allowed": "Speech recognition service is unavailable. Check your internet connection and browser.",
+            "audio-capture": "No working microphone was found. Check Windows microphone settings.",
+            "no-speech": "No speech was detected. Tap the microphone and speak clearly.",
+            "network": "Voice recognition needs an internet connection in this browser.",
+            "aborted": "Voice input was stopped. Tap the microphone again when you are ready."
+        };
+        if (typeof showMessage === "function") showMessage(messages[event.error] || "Voice input could not start. Please check the microphone and browser settings.", "error");
+    };
+
+    if (voiceBtn) setVoiceButton("idle");
+}
+
+async function prepareMicrophonePermission() {
+    // getUserMedia can permanently establish the microphone permission on secure
+    // origins (HTTPS/localhost). Do not call it repeatedly.
+    if (voicePermissionChecked) return true;
+    voicePermissionChecked = true;
+
+    const secure = window.isSecureContext || location.hostname === "localhost" || location.hostname === "127.0.0.1";
+    if (!secure || !navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) return true;
+
+    try {
+        const stream = await navigator.mediaDevices.getUserMedia({audio: true});
+        stream.getTracks().forEach(track => track.stop());
+        return true;
+    } catch (error) {
+        voicePermissionChecked = false;
+        const message = error && error.name === "NotAllowedError"
+            ? "Microphone permission is blocked. Allow Microphone for MediFlow in Chrome site settings and try again."
+            : "MediFlow could not access the microphone. Check that a microphone is connected and enabled in Windows.";
+        if (typeof showMessage === "function") showMessage(message, "error");
+        return false;
+    }
+}
+
+async function startVoiceInput() {
+    const voiceBtn = document.getElementById("voiceBtn");
+    if (!recognition) {
+        if (typeof showMessage === "function") showMessage("Voice input is not supported in this browser. Please use the latest Chrome or Edge.", "error");
+        return;
+    }
+    if (window.voiceRecognitionActive || voiceStarting) return;
+
+    voiceStarting = true;
+    setVoiceButton("starting");
+
+    const permissionOk = await prepareMicrophonePermission();
+    if (!permissionOk) {
+        voiceStarting = false;
+        setVoiceButton("idle");
+        return;
+    }
+
+    recognition.lang = typeof getSpeechLanguage === "function"
+        ? getSpeechLanguage()
+        : (((localStorage.getItem("mediflow_language") || localStorage.getItem("language")) === "Bangla") ? "bn-BD" : "en-US");
+
+    try {
+        recognition.start();
+    } catch (error) {
+        voiceStarting = false;
+        if (error && error.name === "InvalidStateError") {
+            try { recognition.abort(); } catch (_) {}
+            setVoiceButton("idle");
+            return;
+        }
+        if (voiceBtn) setVoiceButton("idle");
+    }
+}
+
+async function switchInputMode(  
+    mode,  
+    button  
+) {  
+  
+    inputMode =  
+        mode;  
+  
+  
+    document  
+        .querySelectorAll(".input-tab")  
+        .forEach(  
+            tab => {  
+  
+                tab.classList.remove(  
+                    "active"  
+                );  
+  
+            }  
+        );  
+  
+  
+    if (button) {  
+  
+        button.classList.add(  
+            "active"  
+        );  
+  
+    }  
+  
+  
+    const typePanel =  
+        document.getElementById(  
+            "typeSymptomsPanel"  
+        );  
+  
+  
+    const selectPanel =  
+        document.getElementById(  
+            "selectSymptomsPanel"  
+        );  
+  
+  
+    if (typePanel) {  
+  
+        typePanel.style.display =  
+            mode === "type"  
+                ? "block"  
+                : "none";  
+  
+    }  
+  
+  
+    if (selectPanel) {  
+  
+        selectPanel.style.display =  
+            mode === "select"  
+                ? "block"  
+                : "none";  
+  
+    }  
+  
+  
+    if (  
+        mode === "select" &&  
+        availableSymptoms.length === 0  
+    ) {  
+  
+        try {  
+  
+            const response =  
+                await fetch(  
+                    "/api/symptoms"  
+                );  
+  
+  
+            if (!response.ok) {  
+  
+                throw new Error(  
+                    "Unable to load symptoms."  
+                );  
+  
+            }  
+  
+  
+            const data =  
+                await response.json();  
+  
+  
+            availableSymptoms =  
+                data.symptoms || [];  
+  
+  
+            renderSymptomOptions("");  
+  
+        } catch (error) {  
+  
+            console.error(  
+                error  
+            );  
+  
+  
+            showMessage(  
+                "Unable to load symptoms. Please try again.",  
+                "error"  
+            );  
+  
+        }  
+  
+    }  
+  
+}  
+  
+  
+/* ===============================================================  
+   RENDER SYMPTOM OPTIONS  
+   =============================================================== */  
+  
+function renderSymptomOptions(query) {  
+  
+    const list =  
+        document.getElementById(  
+            "symptomSelectList"  
+        );  
+  
+  
+    if (!list) {  
+  
+        return;  
+  
+    }  
+  
+  
+    const normalizedQuery =  
+        (query || "")  
+            .toLowerCase()  
+            .trim();  
+  
+  
+    const matches = availableSymptoms
+        .filter(symptom => !selectedSymptoms.has(symptom))
+        .filter(symptom => {
+            const english = String(symptom).toLowerCase();
+            const bangla = typeof mediflowSymptomLabel === "function"
+                ? String(mediflowSymptomLabel(symptom)).toLowerCase()
+                : english;
+            return english.includes(normalizedQuery) || bangla.includes(normalizedQuery);
+        })
+        .slice(0, 30);  
+  
+  
+    if (matches.length) {  
+  
+        list.innerHTML =  
+            matches  
+  
+                .map(  
+                    symptom => `  
+  
+                        <button  
+                            type="button"  
+                            class="select-symptom-option"  
+                            data-symptom="${escapeHtml(symptom)}"  
+                        >  
+  
+                            ${escapeHtml(typeof mediflowSymptomLabel === "function" ? mediflowSymptomLabel(symptom) : symptom)}  
+  
+                        </button>  
+  
+                    `  
+                )  
+  
+                .join("");  
+  
+    } else {  
+  
+        list.innerHTML = `  
+  
+            <div class="select-symptom-option">  
+  
+                No matching symptoms  
+  
+            </div>  
+  
+        `;  
+  
+    }  
+  
+  
+    list.scrollTop =  
+        0;  
+  
+}  
+  
+  
+/* ===============================================================  
+   RENDER SELECTED SYMPTOMS  
+   =============================================================== */  
+  
+function renderSelectedSymptoms() {  
+  
+    const container =  
+        document.getElementById(  
+            "selectedSymptomTags"  
+        );  
+  
+  
+    if (!container) {  
+  
+        return;  
+  
+    }  
+  
+  
+    container.innerHTML =  
+        Array.from(  
+            selectedSymptoms  
+        )  
+  
+            .map(  
+                symptom => `  
+  
+                    <span  
+                        class="tag selected-symptom-tag"  
+                    >  
+  
+                        ${escapeHtml(typeof mediflowSymptomLabel === "function" ? mediflowSymptomLabel(symptom) : symptom)}  
+  
+                        <button  
+                            type="button"  
+                            aria-label="Remove symptom" data-i18n-title="Remove symptom"  
+                            data-remove-symptom="${escapeHtml(symptom)}"  
+                        >  
+  
+                            ×  
+  
+                        </button>  
+  
+                    </span>  
+  
+                `  
+            )  
+  
+            .join("");  
+  
+}  
+  
+  
+/* ===============================================================  
+   SEARCH SYMPTOMS  
+   =============================================================== */  
+  
+function setupSymptomSearch() {  
+  
+    const search =  
+        document.getElementById(  
+            "symptomSelectSearch"  
+        );  
+  
+  
+    const list =  
+        document.getElementById(  
+            "symptomSelectList"  
+        );  
+  
+  
+    if (!search || !list) {  
+  
+        return;  
+  
+    }  
+  
+  
+    search.addEventListener(  
+        "input",  
+        function (event) {  
+  
+            list.style.display =  
+                "block";  
+  
+  
+            renderSymptomOptions(  
+                event.target.value  
+            );  
+  
+        }  
+    );  
+  
+  
+    search.addEventListener(  
+        "focus",  
+        function () {  
+  
+            list.style.display =  
+                "block";  
+  
+  
+            renderSymptomOptions(  
+                search.value  
+            );  
+  
+        }  
+    );  
+  
+  
+    search.addEventListener(  
+        "click",  
+        function () {  
+  
+            list.style.display =  
+                "block";  
+  
+  
+            renderSymptomOptions(  
+                search.value  
+            );  
+  
+        }  
+    );  
+  
+}  
+  
+  
+/* ===============================================================  
+   SELECT SYMPTOM  
+   =============================================================== */  
+  
+function setupSymptomSelection() {  
+  
+    const list =  
+        document.getElementById(  
+            "symptomSelectList"  
+        );  
+  
+  
+    if (!list) {  
+  
+        return;  
+  
+    }  
+  
+  
+    list.addEventListener(  
+        "click",  
+        function (event) {  
+  
+            const option =  
+                event.target.closest(  
+                    "[data-symptom]"  
+                );  
+  
+  
+            if (!option) {  
+  
+                return;  
+  
+            }  
+  
+  
+            const symptom =  
+                option.dataset.symptom;  
+  
+  
+            selectedSymptoms.add(  
+                symptom  
+            );  
+  
+  
+            renderSelectedSymptoms();  
+  
+  
+            const search =  
+                document.getElementById(  
+                    "symptomSelectSearch"  
+                );  
+  
+  
+            if (search) {  
+  
+                search.value =  
+                    "";  
+  
+            }  
+  
+  
+            list.style.display =  
+                "none";  
+  
+        }  
+    );  
+  
+}  
+  
+  
+/* ===============================================================  
+   REMOVE SELECTED SYMPTOM  
+   =============================================================== */  
+  
+function setupRemoveSymptom() {  
+  
+    const container =  
+        document.getElementById(  
+            "selectedSymptomTags"  
+        );  
+  
+  
+    if (!container) {  
+  
+        return;  
+  
+    }  
+  
+  
+    container.addEventListener(  
+        "click",  
+        function (event) {  
+  
+            const button =  
+                event.target.closest(  
+                    "[data-remove-symptom]"  
+                );  
+  
+  
+            if (!button) {  
+  
+                return;  
+  
+            }  
+  
+  
+            selectedSymptoms.delete(  
+                button.dataset.removeSymptom  
+            );  
+  
+  
+            renderSelectedSymptoms();  
+  
+        }  
+    );  
+  
+}  
+  
+  
+/* ===============================================================  
+   CLEAR INPUT  
+   =============================================================== */  
+  
+function clearInput() {  
+  
+    const input =  
+        document.getElementById(  
+            "symptomInput"  
+        );  
+  
+  
+    if (input) {  
+  
+        input.value =  
+            "";  
+  
+    }  
+  
+  
+    selectedSymptoms.clear();  
+  
+  
+    renderSelectedSymptoms();  
+  
+  
+    const detected =  
+        document.getElementById(  
+            "detectedSymptoms"  
+        );  
+  
+  
+    if (detected) {  
+  
+        detected.style.display =  
+            "none";  
+  
+    }  
+  
+  
+    const tags =  
+        document.getElementById(  
+            "symptomTags"  
+        );  
+  
+  
+    if (tags) {  
+  
+        tags.innerHTML =  
+            "";  
+  
+    }  
+  
+  
+    const search =  
+        document.getElementById(  
+            "symptomSelectSearch"  
+        );  
+  
+  
+    if (search) {  
+  
+        search.value =  
+            "";  
+  
+    }  
+  
+  
+    const list =  
+        document.getElementById(  
+            "symptomSelectList"  
+        );  
+  
+  
+    if (list) {  
+  
+        list.style.display =  
+            "none";  
+  
+    }  
+  
+  
+    clearMessage();  
+  
+  
+    const results =  
+        document.getElementById(  
+            "results"  
+        );  
+  
+  
+    if (results) {  
+  
+        results.className =  
+            "empty-results";  
+  
+  
+        results.innerHTML = `  
+  
+            <div>  
+  
+                <div class="empty-icon">  
+                    ✦  
+                </div>  
+  
+                <strong>  
+                    Your analysis will appear here  
+                </strong>  
+  
+                <p  
+                    style="margin-top:7px;font-size:12px;"  
+                >  
+  
+                    Enter your symptoms and click  
+                    "Check Disease".  
+  
+                </p>  
+  
+            </div>  
+  
+        `;  
+  
+    }  
+  
+  
+    const specialistContent =  
+        document.getElementById(  
+            "specialistContent"  
+        );  
+  
+  
+    if (specialistContent) {  
+  
+        specialistContent.innerHTML = `  
+  
+            <div class="specialist-box">  
+  
+                <div class="specialist-info">  
+  
+                    <div class="doctor-avatar">  
+                        ⚕  
+                    </div>  
+  
+                    <div>  
+  
+                        <div class="specialist-name">  
+                            Waiting for analysis  
+                        </div>  
+  
+                        <div class="specialist-label">  
+                            Your recommended specialist  
+                            will appear here.  
+                        </div>  
+  
+                    </div>  
+  
+                </div>  
+  
+            </div>  
+  
+        `;  
+  
+    }  
+  
+  
+    const advice =  
+        document.getElementById(  
+            "adviceContent"  
+        );  
+  
+  
+    if (advice) {  
+  
+        advice.innerHTML = `  
+  
+            <ul class="advice-list">  
+  
+                <li>  
+                    Enter your symptoms clearly.  
+                </li>  
+  
+                <li>  
+                    Include multiple symptoms when possible.  
+                </li>  
+  
+                <li>  
+                    Review the predicted conditions carefully.  
+                </li>  
+  
+                <li>  
+                    Consult a qualified healthcare professional  
+                    for medical decisions.  
+                </li>  
+  
+            </ul>  
+  
+        `;  
+  
+    }  
+  
+  
+    window.lastAnalysisData =  
+        null;  
+  
+}  
+  
+  
+/* ===============================================================  
+   SUBMIT SYMPTOMS  
+   =============================================================== */  
+  
+async function submitSymptoms() {  
+  
+    let text =  
+        "";  
+  
+  
+    if (inputMode === "type") {  
+  
+        const input =  
+            document.getElementById(  
+                "symptomInput"  
+            );  
+  
+  
+        text =  
+            input  
+                ? input.value.trim()  
+                : "";  
+  
+    }  
+  
+  
+    const selected =  
+        Array.from(  
+            selectedSymptoms  
+        );  
+  
+  
+    if (  
+        inputMode === "type" &&  
+        !text  
+    ) {  
+  
+        showMessage(  
+            "Please describe your symptoms before submitting.",  
+            "error"  
+        );  
+  
+        return;  
+  
+    }  
+  
+  
+    if (  
+        inputMode === "select" &&  
+        selected.length === 0  
+    ) {  
+  
+        showMessage(  
+            "Please select at least one symptom before submitting.",  
+            "error"  
+        );  
+  
+        return;  
+  
+    }  
+  
+  
+    clearMessage();  
+  
+  
+    showLoading(  
+        true  
+    );  
+  
+  
+    const results =  
+        document.getElementById(  
+            "results"  
+        );  
+  
+  
+    if (results) {  
+  
+        results.className =  
+            "empty-results";  
+  
+  
+        results.innerHTML = `  
+  
+            <div>  
+  
+                <div class="spinner"></div>  
+  
+                <strong>  
+                    Analyzing symptoms...  
+                </strong>  
+  
+            </div>  
+  
+        `;  
+  
+    }  
+  
+  
+    try {  
+  
+        const endpoint =  
+            inputMode === "select"  
+                ? "/predict"  
+                : "/search_predict";  
+  
+  
+        const body =  
+            inputMode === "select"  
+  
+                ? {  
+                    symptoms:  
+                        selected  
+                }  
+  
+                : {  
+                    text:  
+                        text  
+                };  
+  
+  
+        const response =  
+            await fetch(  
+                endpoint,  
+                {  
+  
+                    method:  
+                        "POST",  
+  
+                    headers:  
+                        {  
+                            "Content-Type":  
+                                "application/json"  
+                        },  
+  
+                    body:  
+                        JSON.stringify(  
+                            body  
+                        )  
+  
+                }  
+            );  
+  
+  
+        const data =  
+            await response.json();  
+  
+  
+        if (  
+            !response.ok ||  
+            !data.success  
+        ) {  
+  
+            if (  
+                data.low_confidence  
+            ) {  
+  
+                window.lastAnalysisData =  
+                    data;  
+  
+  
+                renderLowConfidenceResults(  
+                    data  
+                );  
+  
+  
+                return;  
+  
+            }  
+  
+  
+            throw new Error(  
+                data.error ||  
+                "Unable to analyze symptoms."  
+            );  
+  
+        }  
+  
+  
+        window.lastAnalysisData =  
+            data;  
+  
+  
+        renderResults(  
+            data  
+        );  
+  
+  
+    } catch (error) {  
+  
+        console.error(  
+            error  
+        );  
+  
+  
+        showMessage(  
+            error.message ||  
+            "Unable to analyze symptoms.",  
+            "error"  
+        );  
+  
+  
+        if (results) {  
+  
+            results.className =  
+                "empty-results";  
+  
+  
+            results.innerHTML = `  
+  
+                <div>  
+  
+                    <div class="empty-icon">  
+                        ⚠  
+                    </div>  
+  
+                    <strong>  
+                        Analysis failed  
+                    </strong>  
+  
+                    <p  
+                        style="margin-top:7px;font-size:12px;"  
+                    >  
+  
+                        Please check your symptoms  
+                        and try again.  
+  
+                    </p>  
+  
+                </div>  
+  
+            `;  
+  
+        }  
+  
+    } finally {  
+  
+        showLoading(  
+            false  
+        );  
+  
+    }  
+  
+}  
+  
+  
+/* ===============================================================  
+   ADD SAVE BUTTON  
+   =============================================================== */  
+  
+function addSaveButton() {  
+  
+    const results =  
+        document.getElementById(  
+            "results"  
+        );  
+  
+  
+    if (!results) {  
+  
+        return;  
+  
+    }  
+  
+  
+    const existing =  
+        document.getElementById(  
+            "saveResultButton"  
+        );  
+  
+  
+    if (existing) {  
+  
+        return;  
+  
+    }  
+  
+  
+    const button =  
+        document.createElement(  
+            "button"  
+        );  
+  
+  
+    button.id =  
+        "saveResultButton";  
+  
+  
+    button.type =  
+        "button";  
+  
+  
+    button.textContent =  
+        "☆ Save Result";  
+  
+  
+    button.style.cssText = `  
+  
+        margin-top: 18px;  
+        width: 100%;  
+        padding: 12px 18px;  
+        border: none;  
+        border-radius: 9px;  
+        background: #667eea;  
+        color: white;  
+        font-size: 14px;  
+        font-weight: 600;  
+        cursor: pointer;  
+  
+    `;  
+  
+  
+    button.onclick =  
+        saveCurrentResult;  
+  
+  
+    results.appendChild(  
+        button  
+    );  
+  
+}  
+  
+  
+/* ===============================================================  
+   RENDER RESULTS  
+   =============================================================== */  
+  
+function renderResults(data) {  
+  
+    const results =  
+        document.getElementById(  
+            "results"  
+        );  
+  
+  
+    if (!results) {  
+  
+        return;  
+  
+    }  
+  
+  
+    const predictions =  
+        normalizePredictions(  
+            data  
+        );  
+  
+  
+    const detectedSymptoms =  
+        data.detected_symptoms ||  
+        data.validated_symptoms ||  
+        [];  
+  
+  
+    const topPrediction =  
+        predictions.length  
+            ? predictions[0]  
+            : null;  
+  
+  
+    /* ================= DETECTED ================= */  
+  
+    if (  
+        detectedSymptoms.length  
+    ) {  
+  
+        const detectedBox =  
+            document.getElementById(  
+                "detectedSymptoms"  
+            );  
+  
+  
+        const symptomTags =  
+            document.getElementById(  
+                "symptomTags"  
+            );  
+  
+  
+        if (detectedBox) {  
+  
+            detectedBox.style.display =  
+                "block";  
+  
+        }  
+  
+  
+        if (symptomTags) {  
+  
+            symptomTags.innerHTML =  
+                detectedSymptoms  
+  
+                    .map(  
+                        symptom => `  
+  
+                            <span class="tag">  
+  
+                                ${escapeHtml(symptom)}  
+  
+                            </span>  
+  
+                        `  
+                    )  
+  
+                    .join("");  
+  
+        }  
+  
+    }  
+  
+  
+    if (!topPrediction) {  
+  
+        results.className =  
+            "empty-results";  
+  
+  
+        results.innerHTML = `  
+  
+            <div>  
+  
+                <div class="empty-icon">  
+                    ⚠  
+                </div>  
+  
+                <strong>  
+                    No prediction available.  
+                </strong>  
+  
+            </div>  
+  
+        `;  
+  
+  
+        return;  
+  
+    }  
+  
+  
+    const disease =  
+        topPrediction.disease ||  
+        data.predicted_disease ||  
+        "Unknown";  
+  
+  
+    const confidence =  
+        formatConfidence(  
+            topPrediction  
+        );  
+  
+  
+    let html = `  
+  
+        <div class="main-result">  
+  
+            <div class="result-header">  
+  
+                <div>  
+  
+                    <h3>  
+  
+                        ${escapeHtml(disease)}  
+  
+                        <span class="most-likely">  
+                            Most Likely  
+                        </span>  
+  
+                    </h3>  
+  
+  
+                    <div class="result-description">  
+  
+                        Based on the symptoms provided,  
+                        this condition has the highest  
+                        prediction score.  
+  
+                    </div>  
+  
+                </div>  
+  
+  
+                <div class="probability">  
+  
+                    ${escapeHtml(confidence)}  
+  
+                </div>  
+  
+            </div>  
+  
+        </div>  
+  
+    `;  
+  
+  
+    /* ================= OTHER CONDITIONS ================= */  
+  
+    const others =  
+        predictions.slice(  
+            1  
+        );  
+  
+  
+    if (others.length) {  
+  
+        html += `  
+  
+            <div class="sub-title">  
+  
+                ↕ Other Possible Conditions  
+  
+            </div>  
+  
+        `;  
+  
+  
+        others.forEach(  
+            prediction => {  
+  
+                html += `  
+  
+                    <div class="condition">  
+  
+                        <span class="condition-name">  
+  
+                            ${escapeHtml(  
+                                prediction.disease ||  
+                                "Unknown"  
+                            )}  
+  
+                        </span>  
+  
+  
+                        <span class="condition-score">  
+  
+                            ${escapeHtml(  
+                                formatConfidence(  
+                                    prediction  
+                                )  
+                            )}  
+  
+                        </span>  
+  
+                    </div>  
+  
+                `;  
+  
+            }  
+        );  
+  
+    }  
+  
+  
+    results.className =  
+        "results-card";  
+  
+  
+    results.innerHTML =  
+        html;  
+  
+  
+    addSaveButton();  
+  
+  
+    renderSpecialist(  
+        topPrediction,  
+        data  
+    );  
+  
+  
+    renderAdvice(  
+        topPrediction  
+    );  
+  
+}  
+  
+  
+/* ===============================================================  
+   RENDER SPECIALIST  
+   =============================================================== */  
+  
+function renderSpecialist(  
+    prediction,  
+    data  
+) {  
+  
+    const container =  
+        document.getElementById(  
+            "specialistContent"  
+        );  
+  
+  
+    if (!container) {  
+  
+        return;  
+  
+    }  
+  
+  
+    const specialist =  
+        prediction.specialist ||  
+  
+        (  
+            data.recommended_specialists &&  
+            data.recommended_specialists[0]  
+        ) ||  
+  
+        "General Practitioner";  
+
+    container.innerHTML = `
+        <div class="specialist-box">
+            <div class="specialist-info">
+                <div class="doctor-avatar">⚕</div>
+                <div>
+                    <div class="specialist-name">
+                        ${escapeHtml(specialist)}
+                    </div>
+                    <div class="specialist-label">
+                        Recommended based on the predicted condition.
+                    </div>
+                </div>
+            </div>
+            <button class="find-btn" type="button" onclick="findSpecialist('${escapeHtml(specialist)}')">
+                Find Specialists →
+            </button>
+        </div>
+    `;
+  
+}  
+  
+  
+/* ===============================================================  
+   ADVICE  
+   =============================================================== */  
+  
+function renderAdvice(  
+    prediction  
+) {  
+  
+    const container =  
+        document.getElementById(  
+            "adviceContent"  
+        );  
+  
+  
+    if (!container) {  
+  
+        return;  
+  
+    }  
+
+    const urgency = String(prediction.urgency || "Medium").trim();
+    const urgencyKey = urgency.toLowerCase();
+    const urgencyGuidance = urgencyKey === "high"
+        ? "Please seek medical attention promptly. If symptoms are severe or worsening, use emergency services."
+        : urgencyKey === "low"
+            ? "A doctor visit may not be urgent, but consult a healthcare professional if symptoms persist or worsen."
+            : "Please schedule a healthcare professional visit for assessment, especially if symptoms continue or worsen.";
+  
+  
+    const precautions =  
+        formatPrecautions(  
+            prediction.precautions  
+        );  
+  
+  
+    let html =  
+        `<ul class="advice-list">`;  
+  
+  
+    if (precautions.length) {  
+  
+        precautions  
+            .slice(  
+                0,  
+                6  
+            )  
+            .forEach(  
+                item => {  
+  
+                    html += `  
+  
+                        <li>  
+  
+                            ${escapeHtml(item)}  
+  
+                        </li>  
+  
+                    `;  
+  
+                }  
+            );  
+  
+    } else {  
+  
+        html += `  
+  
+            <li>  
+                Follow up with a qualified  
+                healthcare professional.  
+            </li>  
+  
+            <li>  
+                Monitor your symptoms for changes.  
+            </li>  
+  
+            <li>  
+                Avoid self-diagnosis or  
+                self-medication.  
+            </li>  
+  
+        `;  
+  
+    }  
+  
+  
+    html +=
+        `</ul>
+
+        <div class="urgency">
+            ⚠ Urgency Level:
+            ${escapeHtml(urgency)}
+        </div>
+
+        <div class="urgency-guidance">
+            <strong>What to do:</strong>
+            ${escapeHtml(urgencyGuidance)}
+        </div>`;
+  
+  
+    container.innerHTML =  
+        html;  
+  
+}  
+  
+  
+/* ===============================================================  
+   LOW CONFIDENCE  
+   =============================================================== */  
+  
+function renderLowConfidenceResults(  
+    data  
+) {  
+  
+    const results =  
+        document.getElementById(  
+            "results"  
+        );  
+  
+  
+    if (!results) {  
+  
+        return;  
+  
+    }  
+  
+  
+    const detected =  
+        data.detected_symptoms ||  
+        [];  
+  
+  
+    if (detected.length) {  
+  
+        const detectedBox =  
+            document.getElementById(  
+                "detectedSymptoms"  
+            );  
+  
+  
+        const tags =  
+            document.getElementById(  
+                "symptomTags"  
+            );  
+  
+  
+        if (detectedBox) {  
+  
+            detectedBox.style.display =  
+                "block";  
+  
+        }  
+  
+  
+        if (tags) {  
+  
+            tags.innerHTML =  
+                detected  
+  
+                    .map(  
+                        symptom => `  
+  
+                            <span class="tag">  
+  
+                                ${escapeHtml(symptom)}  
+  
+                            </span>  
+  
+                        `  
+                    )  
+  
+                    .join("");  
+  
+        }  
+  
+    }  
+  
+  
+    const nextSteps =  
+        data.next_steps ||  
+  
+        [  
+            "Provide more specific symptoms.",  
+            "Include related symptoms.",  
+            "Consult a healthcare professional if symptoms persist."  
+        ];  
+  
+  
+    results.className =  
+        "results-card";  
+  
+  
+    results.innerHTML = `  
+  
+        <div class="main-result">  
+  
+            <div class="result-header">  
+  
+                <div>  
+  
+                    <h3>  
+                        Analysis Needs More Information  
+                    </h3>  
+  
+  
+                    <div class="result-description">  
+  
+                        We could not determine a condition  
+                        confidently from the available symptoms.  
+  
+                    </div>  
+  
+                </div>  
+  
+            </div>  
+  
+        </div>  
+  
+  
+        <div class="sub-title">  
+  
+            What you can do  
+  
+        </div>  
+  
+  
+        <ul class="advice-list">  
+  
+            ${nextSteps  
+                .map(  
+                    step => `  
+  
+                        <li>  
+  
+                            ${escapeHtml(step)}  
+  
+                        </li>  
+  
+                    `  
+                )  
+                .join("")  
+            }  
+  
+        </ul>  
+  
+    `;  
+  
+}  
+  
+  
+/* ===============================================================  
+   FIND SPECIALIST  
+   =============================================================== */  
+  
+function findSpecialist(specialist) {
+    const cleanSpecialist = String(specialist || "General Practitioner").trim();
+    try {
+        localStorage.setItem("mediflow_latest_prediction", JSON.stringify({
+            disease: window.lastAnalysisData && window.lastAnalysisData.predicted_disease,
+            recommended_specialist: cleanSpecialist,
+            type: "symptom",
+            date: new Date().toISOString()
+        }));
+    } catch (error) {
+        console.warn("Could not save latest specialist recommendation.", error);
+    }
+    window.location.href = "{{ url_for('find_specialists') }}?specialist=" +
+        encodeURIComponent(cleanSpecialist);
+}
+
+
+/* ===============================================================
+   SAVE CURRENT RESULT  
+   =============================================================== */  
+  
+function saveCurrentResult() {  
+  
+    const data =  
+        window.lastAnalysisData;  
+  
+  
+    if (!data) {  
+  
+        alert(  
+            "No analysis result available to save."  
+        );  
+  
+        return;  
+  
+    }  
+  
+  
+    const predictions =  
+        normalizePredictions(  
+            data  
+        );  
+  
+  
+    if (!predictions.length) {  
+  
+        alert(  
+            "No analysis result available to save."  
+        );  
+  
+        return;  
+  
+    }  
+  
+  
+    const topPrediction =  
+        predictions[0];  
+  
+  
+    const disease =  
+        topPrediction.disease ||  
+        "Unknown";  
+  
+  
+    const confidence =  
+        formatConfidence(  
+            topPrediction  
+        );  
+  
+  
+    const specialist =  
+        topPrediction.specialist ||  
+        "General Practitioner";  
+  
+  
+    const selected =  
+        Array.from(  
+            selectedSymptoms  
+        );  
+  
+  
+    const input =  
+        document.getElementById(  
+            "symptomInput"  
+        );  
+  
+  
+    let symptoms =  
+        selected;  
+  
+  
+    if (  
+        inputMode === "type" &&  
+        input &&  
+        input.value.trim()  
+    ) {  
+  
+        symptoms =  
+            [input.value.trim()];  
+  
+    }  
+  
+  
+    const precautions =  
+        formatPrecautions(  
+            topPrediction.precautions  
+        );  
+  
+  
+    const savedResult = {  
+  
+        id:  
+            Date.now(),  
+  
+        disease:  
+            disease,  
+  
+        confidence:  
+            confidence,  
+  
+        symptoms:  
+            symptoms,  
+  
+        specialist:  
+            specialist,  
+  
+        advice:  
+            precautions.length  
+                ? precautions  
+                    .slice(0, 3)  
+                    .join(", ")  
+                : "Follow up with a qualified healthcare professional.",  
+  
+        date:  
+            new Date()  
+                .toLocaleString()  
+  
+    };  
+  
+  
+    let savedResults =  
+        [];  
+  
+  
+    try {  
+  
+        savedResults =  
+            JSON.parse(  
+                localStorage.getItem(  
+                    "mediflow_saved_results"  
+                )  
+            ) || [];  
+  
+    } catch (error) {  
+  
+        savedResults =  
+            [];  
+  
+    }  
+  
+  
+    savedResults.unshift(  
+        savedResult  
+    );  
+  
+  
+    localStorage.setItem(  
+  
+        "mediflow_saved_results",  
+  
+        JSON.stringify(  
+            savedResults  
+        )  
+  
+    );  
+  
+  
+    alert(  
+        "Result saved successfully!"  
+    );  
+  
+  
+    const button =  
+        document.getElementById(  
+            "saveResultButton"  
+        );  
+  
+  
+    if (button) {  
+  
+        button.textContent =  
+            "✓ Result Saved";  
+  
+  
+        button.disabled =  
+            true;  
+  
+  
+        button.style.opacity =  
+            "0.7";  
+  
+    }  
+  
+}  
+  
+  
+/* ===============================================================  
+   INITIALIZE  
+   =============================================================== */  
+  
+document.addEventListener(  
+    "DOMContentLoaded",  
+    function () {  
+  
+        setupVoiceRecognition();  
+  
+        setupSymptomSearch();  
+  
+        setupSymptomSelection();  
+  
+        setupRemoveSymptom();  
+  
+    }  
+);  
+  
+  
+window.addEventListener("mediflow:languageChanged", () => {
+    try {
+        renderSymptomOptions(document.getElementById("symptomSelectSearch")?.value || "");
+        renderSelectedSymptoms();
+        const input = document.getElementById("symptomInput");
+        if (input && typeof applyLanguage === "function") applyLanguage();
+    } catch (e) { console.warn("Language refresh:", e); }
+});
+</script>  </body>  </html>

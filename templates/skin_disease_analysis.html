@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MediFlow - Skin Disease Analysis</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='theme.css') }}">
+<style>
+.skin-wrap{max-width:1100px;margin:auto}.skin-hero{padding:28px;border-radius:18px;background:linear-gradient(135deg,#2563eb,#4f46e5);color:#fff;margin-bottom:22px}.skin-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px}.skin-card{background:#fff;border:1px solid #e5e7eb;border-radius:16px;padding:24px;box-shadow:0 5px 18px rgba(0,0,0,.05)}.skin-card h2{margin-top:0}.source-tabs{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:18px 0}.source-tab{border:1px solid #d0d5dd;background:#fff;color:#344054;border-radius:10px;padding:11px 14px;font-weight:700;cursor:pointer}.source-tab.active{border-color:#2563eb;background:#eff6ff;color:#175cd3}.source-panel{display:none}.source-panel.active{display:block}.drop{display:block;border:2px dashed #93c5fd;border-radius:14px;padding:28px 20px;text-align:center;cursor:pointer}.drop:hover{background:#f8fbff}.drop input{display:none}.camera-box{border-radius:14px;overflow:hidden;background:#0f172a;min-height:250px;display:flex;align-items:center;justify-content:center;position:relative}.camera-box video{display:none;width:100%;max-height:360px;object-fit:cover}.camera-box.camera-live video{display:block}.camera-placeholder{color:#cbd5e1;text-align:center;padding:35px 20px}.camera-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px}.preview{width:100%;max-height:320px;object-fit:contain;border-radius:12px;margin-top:15px;display:none;background:#f8fafc}.primary-btn,.secondary-btn{border:0;padding:12px 18px;border-radius:10px;font-weight:700;cursor:pointer}.primary-btn{background:#2563eb;color:#fff}.secondary-btn{background:#eef4ff;color:#175cd3;border:1px solid #bfdbfe}.primary-btn:disabled{opacity:.55;cursor:not-allowed}.result{display:none}.meter{height:10px;background:#e5e7eb;border-radius:10px;overflow:hidden;margin:10px 0 18px}.meter span{display:block;height:100%;background:#2563eb;width:0}.pred{padding:13px;border:1px solid #e5e7eb;border-radius:10px;margin:8px 0}.muted{color:#6b7280;line-height:1.6}.error{color:#b42318;margin-top:12px}.status{font-size:13px;color:#667085;margin-top:10px;min-height:20px}.specialist-link{display:inline-block;margin-top:12px;text-decoration:none;padding:10px 14px;border-radius:9px;background:#eef4ff;color:#175cd3;font-weight:700}@media(max-width:800px){.skin-grid{grid-template-columns:1fr}.source-tabs{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="app">
+<aside class="sidebar"><div class="logo"><div class="logo-icon">+</div><div class="logo-text">MediFlow</div></div><nav class="nav">
+<a href="{{ url_for('home') }}" class="nav-item"><span class="nav-icon">⌂</span><span data-i18n="Home">Home</span></a>
+<a href="{{ url_for('symptom_checker') }}" class="nav-item"><span class="nav-icon">🩺</span><span data-i18n="Symptom Checker">Symptom Checker</span></a>
+<a href="{{ url_for('skin_disease_analysis') }}" class="nav-item active"><span class="nav-icon">🧴</span><span data-i18n="Skin Disease Analysis">Skin Disease Analysis</span></a>
+<a href="{{ url_for('find_specialists') }}" class="nav-item"><span class="nav-icon">📍</span><span data-i18n="Find Specialists">Find Specialists</span></a>
+<a href="{{ url_for('health_library') }}" class="nav-item"><span class="nav-icon">📚</span><span data-i18n="Health Library">Health Library</span></a>
+<a href="{{ url_for('saved_results') }}" class="nav-item"><span class="nav-icon">⭐</span><span data-i18n="Saved Results">Saved Results</span></a>
+<a href="{{ url_for('settings') }}" class="nav-item"><span class="nav-icon">⚙️</span><span data-i18n="Settings">Settings</span></a>
+</nav></aside>
+<main class="main"><div class="topbar"><a class="user" href="{{ url_for('profile') }}" style="text-decoration:none;color:inherit"><div class="avatar" id="globalUserAvatar">MF</div><span id="globalUserName" data-i18n="MediFlow User">MediFlow User</span></a></div>
+<div class="content"><div class="skin-wrap">
+<section class="skin-hero"><h1 data-i18n="Skin Disease Analysis">Skin Disease Analysis</h1><p data-i18n="Upload a clear skin image for an AI-assisted screening result.">Upload a clear skin image for an AI-assisted screening result.</p></section>
+<div class="skin-grid">
+<section class="skin-card">
+<h2 data-i18n="Analyze a Skin Image">Analyze a Skin Image</h2>
+<p class="muted" data-i18n="Choose an image from your device or use your camera to take a photo instantly.">Choose an image from your device or use your camera to take a photo instantly.</p>
+<div class="source-tabs" role="tablist">
+<button type="button" id="uploadTab" class="source-tab active" data-i18n="Upload Image">Upload Image</button>
+<button type="button" id="cameraTab" class="source-tab" data-i18n="Live Camera">Live Camera</button>
+</div>
+<div id="uploadPanel" class="source-panel active">
+<label class="drop" for="skinImage"><strong data-i18n="Choose an image">Choose an image</strong><br><span class="muted" data-i18n="JPG, JPEG, PNG — maximum 10 MB">JPG, JPEG, PNG — maximum 10 MB</span><input id="skinImage" type="file" accept="image/jpeg,image/png,image/webp" capture="environment"></label>
+</div>
+<div id="cameraPanel" class="source-panel">
+<div id="cameraBox" class="camera-box"><div id="cameraPlaceholder" class="camera-placeholder" data-i18n="Camera is off. Tap Start Camera to begin.">Camera is off. Tap Start Camera to begin.</div><video id="cameraVideo" autoplay playsinline muted></video></div>
+<div class="camera-actions">
+<button type="button" id="startCameraBtn" class="secondary-btn" data-i18n="Start Camera">Start Camera</button>
+<button type="button" id="captureBtn" class="primary-btn" disabled data-i18n="Take Photo">Take Photo</button>
+<button type="button" id="stopCameraBtn" class="secondary-btn" disabled data-i18n="Stop Camera">Stop Camera</button>
+</div>
+<p id="cameraStatus" class="status" aria-live="polite"></p>
+</div>
+<img id="preview" class="preview" alt="Skin image preview" data-i18n-title="Skin image preview">
+<div id="selectedSource" class="status"></div>
+<button id="analyzeBtn" class="primary-btn" disabled data-i18n="Analyze Skin Image">Analyze Skin Image</button>
+<div id="error" class="error" role="alert"></div>
+</section>
+
+<section class="skin-card result" id="result"><h2 data-i18n="Analysis Result">Analysis Result</h2><h3 id="disease">—</h3><p id="confidenceText">—</p><div class="meter"><span id="meter"></span></div><div id="predictions"></div><a class="specialist-link" href="{{ url_for('find_specialists') }}" data-i18n="Find a Dermatologist →">Find a Dermatologist →</a><p class="muted" style="margin-top:18px" data-i18n="AI-assisted screening only. This is not a medical diagnosis. Consult a qualified dermatologist for assessment.">AI-assisted screening only. This is not a medical diagnosis. Consult a qualified dermatologist for assessment.</p></section>
+
+<section class="skin-card" id="empty"><h2 data-i18n="How it works">How it works</h2><p class="muted" data-i18n="1. Choose Upload Image or Live Camera. 2. Provide a clear, well-lit skin image. 3. Analyze the image and review the screening result. 4. Consult a dermatologist for a professional assessment.">1. Choose Upload Image or Live Camera. 2. Provide a clear, well-lit skin image. 3. Analyze the image and review the screening result. 4. Consult a dermatologist for a professional assessment.</p></section>
+</div></div></div></main></div>
+<script src="{{ url_for('static', filename='js/language.js') }}"></script>
+<script>
+let lastSkinResult=null;
+let selectedFile=null;
+let cameraStream=null;
+const skinT={
+ en:{large:'Image is larger than 10 MB.',confidence:'Confidence: ',error:'Analysis failed.',cameraDenied:'Camera permission was denied or the camera is unavailable.',cameraStarted:'Camera is ready. Position the affected skin area clearly and tap Take Photo.',cameraStopped:'Camera stopped.',cameraUnsupported:'This browser does not support camera access.',captured:'Photo captured successfully.',uploadSelected:'Image selected. Ready to analyze.',camera:'Camera'},
+ bn:{large:'ছবির আকার ১০ MB-এর বেশি।',confidence:'আত্মবিশ্বাস: ',error:'বিশ্লেষণ ব্যর্থ হয়েছে।',cameraDenied:'ক্যামেরার অনুমতি দেওয়া হয়নি অথবা ক্যামেরা পাওয়া যাচ্ছে না।',cameraStarted:'ক্যামেরা প্রস্তুত। আক্রান্ত ত্বকের অংশ পরিষ্কারভাবে ধরে ছবি তুলুন।',cameraStopped:'ক্যামেরা বন্ধ করা হয়েছে।',cameraUnsupported:'এই ব্রাউজারে ক্যামেরা ব্যবহার সমর্থিত নয়।',captured:'ছবি সফলভাবে তোলা হয়েছে।',uploadSelected:'ছবি নির্বাচন করা হয়েছে। বিশ্লেষণের জন্য প্রস্তুত।',camera:'ক্যামেরা'}
+};
+function skinLang(){return (window.MediFlowLanguage&&MediFlowLanguage.get()==='Bangla')?'bn':'en'}
+function setStatus(text){document.getElementById('cameraStatus').textContent=text||''}
+function setSelected(text){document.getElementById('selectedSource').textContent=text||''}
+function renderSkinResult(d){const bn=skinLang()==='bn';document.getElementById('disease').textContent=bn?d.predicted_disease_bn:d.predicted_disease;document.getElementById('confidenceText').textContent=skinT[skinLang()].confidence+d.confidence_percentage;document.getElementById('meter').style.width=(d.confidence*100)+'%';document.getElementById('predictions').innerHTML=d.top_predictions.map((x,i)=>`<div class="pred"><strong>${i+1}. ${bn?x.disease_bn:x.disease}</strong><br><span>${x.probability_percentage}</span></div>`).join('');}
+function saveLatestPrediction(d){localStorage.setItem('mediflow_latest_prediction',JSON.stringify({disease:d.predicted_disease,disease_bn:d.predicted_disease_bn,recommended_specialist:d.recommended_specialist,recommended_specialist_bn:d.recommended_specialist_bn,type:'skin',date:new Date().toISOString()}));}
+function showPreview(file){if(!file)return;const preview=document.getElementById('preview');if(preview.dataset.objectUrl)URL.revokeObjectURL(preview.dataset.objectUrl);const url=URL.createObjectURL(file);preview.dataset.objectUrl=url;preview.src=url;preview.style.display='block';document.getElementById('analyzeBtn').disabled=false;}
+async function startCamera(){
+ if(!navigator.mediaDevices||!navigator.mediaDevices.getUserMedia){setStatus(skinT[skinLang()].cameraUnsupported);return;}
+ try{
+   if(cameraStream) stopCamera(false);
+   cameraStream=await navigator.mediaDevices.getUserMedia({video:{facingMode:{ideal:'environment'},width:{ideal:1280},height:{ideal:720}},audio:false});
+   const video=document.getElementById('cameraVideo');video.srcObject=cameraStream;document.getElementById('cameraBox').classList.add('camera-live');document.getElementById('cameraPlaceholder').style.display='none';document.getElementById('captureBtn').disabled=false;document.getElementById('stopCameraBtn').disabled=false;document.getElementById('startCameraBtn').disabled=true;setStatus(skinT[skinLang()].cameraStarted);
+ }catch(e){setStatus(skinT[skinLang()].cameraDenied);}
+}
+function stopCamera(show=true){if(cameraStream){cameraStream.getTracks().forEach(t=>t.stop());cameraStream=null;}const video=document.getElementById('cameraVideo');video.srcObject=null;document.getElementById('cameraBox').classList.remove('camera-live');document.getElementById('cameraPlaceholder').style.display='block';document.getElementById('captureBtn').disabled=true;document.getElementById('stopCameraBtn').disabled=true;document.getElementById('startCameraBtn').disabled=false;if(show)setStatus(skinT[skinLang()].cameraStopped);}
+function capturePhoto(){const video=document.getElementById('cameraVideo');if(!cameraStream||video.readyState<2)return;const canvas=document.createElement('canvas');canvas.width=video.videoWidth||640;canvas.height=video.videoHeight||480;canvas.getContext('2d').drawImage(video,0,0,canvas.width,canvas.height);canvas.toBlob(blob=>{if(!blob)return;selectedFile=new File([blob],'skin-camera-photo.jpg',{type:'image/jpeg'});showPreview(selectedFile);setSelected(skinT[skinLang()].captured);setStatus(skinT[skinLang()].captured);stopCamera(false);},'image/jpeg',0.92);}
+const fileInput=document.getElementById('skinImage'),btn=document.getElementById('analyzeBtn'),err=document.getElementById('error'),result=document.getElementById('result'),empty=document.getElementById('empty');
+fileInput.addEventListener('change',()=>{err.textContent='';const f=fileInput.files[0];if(!f){selectedFile=null;btn.disabled=true;document.getElementById('preview').style.display='none';return;}if(f.size>10*1024*1024){selectedFile=null;err.textContent=skinT[skinLang()].large;btn.disabled=true;return;}selectedFile=f;showPreview(f);setSelected(skinT[skinLang()].uploadSelected);});
+document.getElementById('startCameraBtn').addEventListener('click',startCamera);document.getElementById('stopCameraBtn').addEventListener('click',()=>stopCamera(true));document.getElementById('captureBtn').addEventListener('click',capturePhoto);
+document.getElementById('uploadTab').addEventListener('click',()=>{document.getElementById('uploadTab').classList.add('active');document.getElementById('cameraTab').classList.remove('active');document.getElementById('uploadPanel').classList.add('active');document.getElementById('cameraPanel').classList.remove('active');stopCamera(false);});
+document.getElementById('cameraTab').addEventListener('click',()=>{document.getElementById('cameraTab').classList.add('active');document.getElementById('uploadTab').classList.remove('active');document.getElementById('cameraPanel').classList.add('active');document.getElementById('uploadPanel').classList.remove('active');});
+btn.addEventListener('click',async()=>{const f=selectedFile;if(!f)return;if(f.size>10*1024*1024){err.textContent=skinT[skinLang()].large;return;}btn.disabled=true;err.textContent='';const fd=new FormData();fd.append('image',f,f.name);try{const r=await fetch("{{ url_for('skin_predict') }}",{method:'POST',body:fd});const d=await r.json();if(!r.ok||!d.success)throw new Error(d.error||skinT[skinLang()].error);lastSkinResult=d;saveLatestPrediction(d);renderSkinResult(d);result.style.display='block';empty.style.display='none';window.scrollTo({top:0,behavior:'smooth'});}catch(e){err.textContent=e.message||skinT[skinLang()].error;}finally{btn.disabled=false;}});
+window.addEventListener('beforeunload',()=>stopCamera(false));
+window.addEventListener('mediflow:languageChanged',()=>{if(lastSkinResult)renderSkinResult(lastSkinResult);});
+</script>
+</body></html>

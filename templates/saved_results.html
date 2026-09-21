@@ -1,0 +1,1067 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>MediFlow - Saved Results</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='style.css') }}">
+
+    <!-- GLOBAL LANGUAGE SYSTEM -->
+    <script src="{{ url_for('static', filename='js/language.js') }}"></script>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f5f7fb;
+            color: #333;
+        }
+
+        .app {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* ================= SIDEBAR ================= */
+
+        .sidebar {
+            width: 250px;
+            background: white;
+            border-right: 1px solid #e5e7eb;
+            padding: 25px 18px;
+            position: fixed;
+            left: 0;
+            top: 0;
+            bottom: 0;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 35px;
+            padding-left: 10px;
+        }
+
+        .logo-icon {
+            width: 38px;
+            height: 38px;
+            border-radius: 10px;
+            background: #667eea;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            font-weight: bold;
+        }
+
+        .logo-text {
+            font-size: 22px;
+            font-weight: 700;
+        }
+
+        .nav {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 13px;
+            padding: 13px 15px;
+            border-radius: 10px;
+            text-decoration: none;
+            color: #666;
+            transition: 0.2s;
+        }
+
+        .nav-item:hover {
+            background: #f1f3ff;
+            color: #667eea;
+        }
+
+        .nav-item.active {
+            background: #667eea;
+            color: white;
+        }
+
+        .nav-icon {
+            width: 24px;
+            text-align: center;
+        }
+
+        /* ================= MAIN ================= */
+
+        .main {
+            margin-left: 250px;
+            width: calc(100% - 250px);
+        }
+
+        .topbar {
+            height: 75px;
+            background: white;
+            border-bottom: 1px solid #e5e7eb;
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            padding: 0 30px;
+        }
+
+        .user {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .avatar {
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            background: #667eea;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+        }
+
+        .content {
+            padding: 30px;
+        }
+
+        /* ================= HEADER ================= */
+
+        .page-header {
+            margin-bottom: 25px;
+        }
+
+        .page-header h1 {
+            margin: 0 0 8px;
+            font-size: 30px;
+            color: #222;
+        }
+
+        .page-header p {
+            margin: 0;
+            color: #777;
+        }
+
+        /* ================= TOOLBAR ================= */
+
+        .toolbar {
+            background: white;
+            border-radius: 15px;
+            padding: 18px 20px;
+            margin-bottom: 25px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 15px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.05);
+        }
+
+        .result-count {
+            color: #777;
+            font-size: 14px;
+        }
+
+        .clear-all-btn {
+            border: none;
+            background: #ef4444;
+            color: white;
+            padding: 10px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+        .clear-all-btn:hover {
+            opacity: 0.9;
+        }
+
+        /* ================= RESULTS ================= */
+
+        .saved-results {
+            display: flex;
+            flex-direction: column;
+            gap: 18px;
+        }
+
+        .result-card {
+            background: white;
+            border-radius: 15px;
+            padding: 22px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.06);
+        }
+
+        .result-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 20px;
+        }
+
+        .disease-name {
+            font-size: 21px;
+            font-weight: 700;
+            color: #222;
+            margin-bottom: 7px;
+        }
+
+        .saved-date {
+            color: #888;
+            font-size: 13px;
+        }
+
+        .confidence {
+            background: #eef0ff;
+            color: #667eea;
+            padding: 8px 12px;
+            border-radius: 8px;
+            font-weight: 700;
+            white-space: nowrap;
+        }
+
+        .result-info {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .info-box {
+            background: #f7f8ff;
+            border-radius: 10px;
+            padding: 14px;
+        }
+
+        .info-title {
+            font-size: 12px;
+            color: #888;
+            margin-bottom: 6px;
+            font-weight: 600;
+        }
+
+        .info-value {
+            font-size: 14px;
+            color: #444;
+            line-height: 1.5;
+        }
+
+        .symptom-tag {
+            display: inline-block;
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            padding: 4px 8px;
+            margin: 3px 3px 3px 0;
+            font-size: 12px;
+        }
+
+        .result-actions {
+            display: flex;
+            justify-content: flex-end;
+            margin-top: 18px;
+            gap: 10px;
+        }
+
+        .delete-btn {
+            border: none;
+            background: #fee2e2;
+            color: #dc2626;
+            padding: 9px 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+        .delete-btn:hover {
+            background: #fecaca;
+        }
+
+        /* ================= EMPTY ================= */
+
+        .empty-state {
+            background: white;
+            border-radius: 15px;
+            padding: 70px 30px;
+            text-align: center;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.06);
+        }
+
+        .empty-icon {
+            font-size: 55px;
+            margin-bottom: 15px;
+        }
+
+        .empty-state h2 {
+            margin: 0 0 10px;
+            color: #333;
+        }
+
+        .empty-state p {
+            color: #888;
+            margin-bottom: 20px;
+        }
+
+        .checker-btn {
+            display: inline-block;
+            text-decoration: none;
+            background: #667eea;
+            color: white;
+            padding: 12px 20px;
+            border-radius: 9px;
+            font-weight: 600;
+        }
+
+        /* ================= DISCLAIMER ================= */
+
+        .disclaimer {
+            margin-top: 25px;
+            background: white;
+            border-radius: 12px;
+            padding: 18px;
+            color: #777;
+            font-size: 13px;
+            line-height: 1.6;
+        }
+
+        /* ================= RESPONSIVE ================= */
+
+        @media (max-width: 800px) {
+
+            .sidebar {
+                width: 210px;
+            }
+
+            .main {
+                margin-left: 210px;
+                width: calc(100% - 210px);
+            }
+
+            .content {
+                padding: 20px;
+            }
+
+            .result-info {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='theme.css') }}">
+</head>
+
+<body>
+
+<div class="app">
+
+    <!-- ================= SIDEBAR ================= -->
+
+    <aside class="sidebar">
+
+        <div class="logo">
+            <div class="logo-icon">+</div>
+            <div class="logo-text">MediFlow</div>
+        </div>
+
+        <nav class="nav">
+
+            <a href="{{ url_for('home') }}"
+               class="nav-item">
+
+                <span class="nav-icon" aria-hidden="true">🏠</span>
+
+                <span data-i18n="Home">
+                    Home
+                </span>
+
+            </a>
+
+
+            <a href="{{ url_for('skin_disease_analysis') }}" class="nav-item">🧴 <span data-i18n="Skin Disease Analysis">Skin Disease Analysis</span></a>
+<a href="{{ url_for('symptom_checker') }}"
+               class="nav-item">
+
+                <span class="nav-icon" aria-hidden="true">🩺</span>
+
+                <span data-i18n="Symptom Checker">
+                    Symptom Checker
+                </span>
+
+            </a>
+
+
+            <a href="{{ url_for('find_specialists') }}"
+               class="nav-item">
+
+                <span class="nav-icon" aria-hidden="true">📍</span>
+
+                <span data-i18n="Find Specialists">
+                    Find Specialists
+                </span>
+
+            </a>
+
+
+            <a href="{{ url_for('health_library') }}"
+               class="nav-item">
+
+                <span class="nav-icon" aria-hidden="true">📚</span>
+
+                <span data-i18n="Health Library">
+                    Health Library
+                </span>
+
+            </a>
+
+
+            <a href="{{ url_for('saved_results') }}"
+               class="nav-item active">
+
+                <span class="nav-icon" aria-hidden="true">⭐</span>
+
+                <span data-i18n="Saved Results">
+                    Saved Results
+                </span>
+
+            </a>
+
+
+            <a href="{{ url_for('settings') }}"
+               class="nav-item">
+
+                <span class="nav-icon" aria-hidden="true">⚙️</span>
+
+                <span data-i18n="Settings">
+                    Settings
+                </span>
+
+            </a>
+
+        </nav>
+
+    </aside>
+
+
+    <!-- ================= MAIN ================= -->
+
+    <main class="main">
+
+        <div class="topbar">
+
+            <div class="user">
+
+                <div class="avatar">
+                    MF
+                </div>
+
+                <div data-i18n="MediFlow User">
+                    MediFlow User
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <div class="content">
+
+            <!-- ================= HEADER ================= -->
+
+            <div class="page-header">
+
+                <h1 data-i18n="Saved Results">
+                    Saved Results
+                </h1>
+
+                <p data-i18n="Review your previously saved disease predictions and recommendations.">
+                    Review your previously saved disease predictions
+                    and recommendations.
+                </p>
+
+            </div>
+
+
+            <!-- ================= TOOLBAR ================= -->
+
+            <div
+                class="toolbar"
+                id="toolbar"
+                style="display:none;"
+            >
+
+                <div
+                    class="result-count"
+                    id="resultCount"
+                >
+                </div>
+
+                <button
+                    class="clear-all-btn"
+                    onclick="clearAllResults()"
+                    data-i18n="Clear All"
+                >
+                    Clear All
+                </button>
+
+            </div>
+
+
+            <!-- ================= RESULTS ================= -->
+
+            <div
+                id="savedResults"
+                class="saved-results"
+            ></div>
+
+
+            <!-- ================= DISCLAIMER ================= -->
+
+            <div class="disclaimer">
+
+                ⚠
+
+                <strong data-i18n="Medical Disclaimer:">
+                    Medical Disclaimer:
+                </strong>
+
+                <span data-i18n="Saved results are based on MediFlow's informational prediction system. They are not a medical diagnosis and should not replace professional medical advice.">
+                    Saved results are based on MediFlow's informational
+                    prediction system. They are not a medical diagnosis
+                    and should not replace professional medical advice.
+                </span>
+
+            </div>
+
+        </div>
+
+    </main>
+
+</div>
+
+
+<script>
+
+    /* =====================================================
+       LOAD SAVED RESULTS
+       ===================================================== */
+
+    function getSavedResults() {
+
+        try {
+
+            const saved =
+                localStorage.getItem(
+                    "mediflow_saved_results"
+                );
+
+            return saved
+                ? JSON.parse(saved)
+                : [];
+
+        } catch (error) {
+
+            console.error(
+                "Unable to load saved results:",
+                error
+            );
+
+            return [];
+
+        }
+
+    }
+
+
+    /* =====================================================
+       SAVE RESULTS TO STORAGE
+       ===================================================== */
+
+    function saveResults(results) {
+
+        localStorage.setItem(
+            "mediflow_saved_results",
+            JSON.stringify(results)
+        );
+
+    }
+
+
+    /* =====================================================
+       DISPLAY RESULTS
+       ===================================================== */
+
+    function renderSavedResults() {
+
+        const container =
+            document.getElementById(
+                "savedResults"
+            );
+
+        const toolbar =
+            document.getElementById(
+                "toolbar"
+            );
+
+        const count =
+            document.getElementById(
+                "resultCount"
+            );
+
+
+        const results =
+            getSavedResults();
+
+
+        /* =================================================
+           EMPTY STATE
+           ================================================= */
+
+        if (results.length === 0) {
+
+            toolbar.style.display =
+                "none";
+
+
+            container.innerHTML = `
+
+                <div class="empty-state">
+
+                    <div class="empty-icon">
+                        ☆
+                    </div>
+
+                    <h2 data-i18n="No Saved Results">
+                        No Saved Results
+                    </h2>
+
+                    <p data-i18n="Your saved disease predictions will appear here.">
+                        Your saved disease predictions
+                        will appear here.
+                    </p>
+
+                    <a
+                        href="{{ url_for('symptom_checker') }}"
+                        class="checker-btn"
+                        data-i18n="Go to Symptom Checker →"
+                    >
+                        Go to Symptom Checker →
+                    </a>
+
+                </div>
+
+            `;
+
+            applyLanguage();
+
+            return;
+
+        }
+
+
+        /* =================================================
+           TOOLBAR
+           ================================================= */
+
+        toolbar.style.display =
+            "flex";
+
+
+        updateResultCount(
+            results.length
+        );
+
+
+        /* =================================================
+           CARDS
+           ================================================= */
+
+        container.innerHTML =
+            results.map(
+                (result, index) => {
+
+                    const symptoms =
+                        result.symptoms || [];
+
+
+                    return `
+
+                        <div class="result-card">
+
+                            <div class="result-top">
+
+                                <div>
+
+                                    <div class="disease-name">
+                                        🩺
+                                        ${escapeHtml(
+                                            result.disease ||
+                                            "Unknown"
+                                        )}
+                                    </div>
+
+                                    <div class="saved-date">
+
+                                        <span data-i18n="Saved:">
+                                            Saved:
+                                        </span>
+
+                                        ${escapeHtml(
+                                            result.date ||
+                                            "Unknown date"
+                                        )}
+
+                                    </div>
+
+                                </div>
+
+
+                                <div class="confidence">
+
+                                    ${escapeHtml(
+                                        result.confidence ||
+                                        "N/A"
+                                    )}
+
+                                </div>
+
+                            </div>
+
+
+                            <div class="result-info">
+
+                                <div class="info-box">
+
+                                    <div
+                                        class="info-title"
+                                        data-i18n="SYMPTOMS"
+                                    >
+                                        SYMPTOMS
+                                    </div>
+
+                                    <div class="info-value">
+
+                                        ${
+                                            symptoms.length
+
+                                            ? symptoms
+                                                .map(
+                                                    symptom => `
+
+                                                        <span
+                                                            class="symptom-tag"
+                                                        >
+                                                            ${escapeHtml(
+                                                                symptom
+                                                            )}
+                                                        </span>
+
+                                                    `
+                                                )
+                                                .join("")
+
+                                            : `
+
+                                                <span data-i18n="No symptoms recorded">
+                                                    No symptoms recorded
+                                                </span>
+
+                                            `
+                                        }
+
+                                    </div>
+
+                                </div>
+
+
+                                <div class="info-box">
+
+                                    <div
+                                        class="info-title"
+                                        data-i18n="RECOMMENDED SPECIALIST"
+                                    >
+                                        RECOMMENDED SPECIALIST
+                                    </div>
+
+                                    <div class="info-value">
+
+                                        ${escapeHtml(
+                                            result.specialist ||
+                                            "General Practitioner"
+                                        )}
+
+                                    </div>
+
+                                </div>
+
+
+                                ${
+                                    result.advice
+
+                                    ? `
+
+                                        <div class="info-box">
+
+                                            <div
+                                                class="info-title"
+                                                data-i18n="ADVICE"
+                                            >
+                                                ADVICE
+                                            </div>
+
+                                            <div class="info-value">
+
+                                                ${escapeHtml(
+                                                    result.advice
+                                                )}
+
+                                            </div>
+
+                                        </div>
+
+                                    `
+
+                                    : ""
+                                }
+
+                            </div>
+
+
+                            <div class="result-actions">
+
+                                <button
+                                    class="delete-btn"
+                                    onclick="deleteResult(${index})"
+                                    data-i18n="🗑 Delete"
+                                >
+                                    🗑 Delete
+                                </button>
+
+                            </div>
+
+                        </div>
+
+                    `;
+
+                }
+            )
+            .join("");
+
+
+        applyLanguage();
+
+    }
+
+
+    /* =====================================================
+       RESULT COUNT
+       ===================================================== */
+
+    function updateResultCount(total) {
+
+        const count =
+            document.getElementById(
+                "resultCount"
+            );
+
+
+        if (!count) {
+            return;
+        }
+
+
+        if (total === 1) {
+
+            count.textContent =
+                "1 saved result";
+
+        } else {
+
+            count.textContent =
+                total +
+                " saved results";
+
+        }
+
+
+        /*
+         * Translate result count manually because
+         * the number is dynamic.
+         */
+
+        if (
+            typeof getCurrentLanguage ===
+            "function" &&
+            getCurrentLanguage() === "Bangla"
+        ) {
+
+            if (total === 1) {
+
+                count.textContent =
+                    "১টি সংরক্ষিত ফলাফল";
+
+            } else {
+
+                count.textContent =
+                    total +
+                    "টি সংরক্ষিত ফলাফল";
+
+            }
+
+        }
+
+    }
+
+
+    /* =====================================================
+       DELETE ONE RESULT
+       ===================================================== */
+
+    function deleteResult(index) {
+
+        const results =
+            getSavedResults();
+
+
+        results.splice(
+            index,
+            1
+        );
+
+
+        saveResults(
+            results
+        );
+
+
+        renderSavedResults();
+
+    }
+
+
+    /* =====================================================
+       DELETE ALL
+       ===================================================== */
+
+    function clearAllResults() {
+
+        const results =
+            getSavedResults();
+
+
+        if (results.length === 0) {
+            return;
+        }
+
+
+        let confirmed;
+
+
+        if (
+            typeof getCurrentLanguage ===
+            "function" &&
+            getCurrentLanguage() === "Bangla"
+        ) {
+
+            confirmed =
+                confirm(
+                    "আপনি কি নিশ্চিত যে সব সংরক্ষিত ফলাফল মুছে ফেলতে চান?"
+                );
+
+        } else {
+
+            confirmed =
+                confirm(
+                    "Are you sure you want to delete all saved results?"
+                );
+
+        }
+
+
+        if (!confirmed) {
+            return;
+        }
+
+
+        localStorage.removeItem(
+            "mediflow_saved_results"
+        );
+
+
+        renderSavedResults();
+
+    }
+
+
+    /* =====================================================
+       ESCAPE HTML
+       ===================================================== */
+
+    function escapeHtml(value) {
+
+        if (
+            value === null ||
+            value === undefined
+        ) {
+            return "";
+        }
+
+
+        return String(value)
+
+            .replace(
+                /&/g,
+                "&amp;"
+            )
+
+            .replace(
+                /</g,
+                "&lt;"
+            )
+
+            .replace(
+                />/g,
+                "&gt;"
+            )
+
+            .replace(
+                /"/g,
+                "&quot;"
+            )
+
+            .replace(
+                /'/g,
+                "&#039;"
+            );
+
+    }
+
+
+    /* =====================================================
+       INITIAL LOAD
+       ===================================================== */
+
+    document.addEventListener(
+        "DOMContentLoaded",
+        function() {
+
+            renderSavedResults();
+
+        }
+    );
+
+</script>
+
+</body>
+</html>

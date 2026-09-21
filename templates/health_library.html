@@ -1,0 +1,901 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>MediFlow - Health Library</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='style.css') }}">
+
+    <!-- ================= LANGUAGE SYSTEM ================= -->
+    <script src="{{ url_for('static', filename='js/language.js') }}"></script>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f5f7fb;
+            color: #333;
+        }
+
+        .app {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* ================= SIDEBAR ================= */
+
+        .sidebar {
+            width: 250px;
+            background: white;
+            border-right: 1px solid #e5e7eb;
+            padding: 25px 18px;
+            position: fixed;
+            left: 0;
+            top: 0;
+            bottom: 0;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 35px;
+            padding-left: 10px;
+        }
+
+        .logo-icon {
+            width: 38px;
+            height: 38px;
+            border-radius: 10px;
+            background: #667eea;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            font-weight: bold;
+        }
+
+        .logo-text {
+            font-size: 22px;
+            font-weight: 700;
+        }
+
+        .nav {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 13px;
+            padding: 13px 15px;
+            border-radius: 10px;
+            text-decoration: none;
+            color: #666;
+            transition: 0.2s;
+        }
+
+        .nav-item:hover {
+            background: #f1f3ff;
+            color: #667eea;
+        }
+
+        .nav-item.active {
+            background: #667eea;
+            color: white;
+        }
+
+        .nav-icon {
+            width: 24px;
+            text-align: center;
+        }
+
+        /* ================= MAIN ================= */
+
+        .main {
+            margin-left: 250px;
+            width: calc(100% - 250px);
+        }
+
+        .topbar {
+            height: 75px;
+            background: white;
+            border-bottom: 1px solid #e5e7eb;
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            padding: 0 30px;
+        }
+
+        .user {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .avatar {
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            background: #667eea;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+        }
+
+        .content {
+            padding: 30px;
+        }
+
+        /* ================= HEADER ================= */
+
+        .page-header {
+            margin-bottom: 25px;
+        }
+
+        .page-header h1 {
+            margin: 0 0 8px;
+            font-size: 30px;
+            color: #222;
+        }
+
+        .page-header p {
+            margin: 0;
+            color: #777;
+        }
+
+        /* ================= SEARCH ================= */
+
+        .library-search {
+            background: white;
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 25px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.05);
+        }
+
+        .library-search input {
+            width: 100%;
+            padding: 14px 16px;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            outline: none;
+            font-size: 15px;
+        }
+
+        .library-search input:focus {
+            border-color: #667eea;
+        }
+
+        /* ================= CARDS ================= */
+
+        .library-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+        }
+
+        .library-card {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.06);
+            transition: 0.2s;
+        }
+
+        .library-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.09);
+        }
+
+        .library-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 12px;
+            background: #eef0ff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 25px;
+            margin-bottom: 15px;
+        }
+
+        .library-card h2 {
+            margin: 0 0 8px;
+            font-size: 19px;
+        }
+
+        .library-card p {
+            color: #777;
+            font-size: 14px;
+            line-height: 1.6;
+            margin-bottom: 15px;
+        }
+
+        .library-list {
+            margin: 0;
+            padding-left: 20px;
+            color: #555;
+            line-height: 1.9;
+            font-size: 14px;
+        }
+
+        /* ================= FULL WIDTH ================= */
+
+        .full-card {
+            grid-column: 1 / -1;
+        }
+
+        .warning-card {
+            border-left: 5px solid #f59e0b;
+        }
+
+        .warning-card h2 {
+            color: #b45309;
+        }
+
+        /* ================= DISCLAIMER ================= */
+
+        .disclaimer {
+            margin-top: 25px;
+            background: white;
+            border-radius: 12px;
+            padding: 18px;
+            color: #777;
+            font-size: 13px;
+            line-height: 1.6;
+        }
+
+        /* ================= RESPONSIVE ================= */
+
+        @media (max-width: 900px) {
+
+            .library-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .full-card {
+                grid-column: auto;
+            }
+        }
+
+        @media (max-width: 800px) {
+
+            .sidebar {
+                width: 210px;
+            }
+
+            .main {
+                margin-left: 210px;
+                width: calc(100% - 210px);
+            }
+
+            .content {
+                padding: 20px;
+            }
+        }
+    </style>
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='theme.css') }}">
+</head>
+
+<body>
+
+<div class="app">
+
+    <!-- ================= SIDEBAR ================= -->
+
+    <aside class="sidebar">
+
+        <div class="logo">
+            <div class="logo-icon">+</div>
+            <div class="logo-text">MediFlow</div>
+        </div>
+
+        <nav class="nav">
+
+            <a href="{{ url_for('home') }}" class="nav-item">
+                <span class="nav-icon" aria-hidden="true">🏠</span>
+                <span data-i18n="Home">Home</span>
+            </a>
+
+            <a href="{{ url_for('skin_disease_analysis') }}" class="nav-item">🧴 <span data-i18n="Skin Disease Analysis">Skin Disease Analysis</span></a>
+<a href="{{ url_for('symptom_checker') }}" class="nav-item">
+                <span class="nav-icon" aria-hidden="true">🩺</span>
+                <span data-i18n="Symptom Checker">
+                    Symptom Checker
+                </span>
+            </a>
+
+            <a href="{{ url_for('find_specialists') }}" class="nav-item">
+                <span class="nav-icon" aria-hidden="true">📍</span>
+                <span data-i18n="Find Specialists">
+                    Find Specialists
+                </span>
+            </a>
+
+            <a href="{{ url_for('health_library') }}"
+               class="nav-item active">
+                <span class="nav-icon" aria-hidden="true">📚</span>
+                <span data-i18n="Health Library">
+                    Health Library
+                </span>
+            </a>
+
+            <a href="{{ url_for('saved_results') }}"
+               class="nav-item">
+                <span class="nav-icon" aria-hidden="true">⭐</span>
+                <span data-i18n="Saved Results">
+                    Saved Results
+                </span>
+            </a>
+
+            <a href="{{ url_for('settings') }}" class="nav-item">
+                <span class="nav-icon" aria-hidden="true">⚙️</span>
+                <span data-i18n="Settings">
+                    Settings
+                </span>
+            </a>
+
+        </nav>
+
+    </aside>
+
+
+    <!-- ================= MAIN ================= -->
+
+    <main class="main">
+
+        <div class="topbar">
+
+            <div class="user">
+
+                <div class="avatar">
+                    MF
+                </div>
+
+                <div data-i18n="MediFlow User">
+                    MediFlow User
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <div class="content">
+
+            <!-- ================= HEADER ================= -->
+
+            <div class="page-header">
+
+                <h1 data-i18n="Health Library">
+                    Health Library
+                </h1>
+
+                <p data-i18n="Explore useful information about diseases, symptoms, prevention and healthcare specialists.">
+                    Explore useful information about diseases,
+                    symptoms, prevention and healthcare specialists.
+                </p>
+
+            </div>
+
+
+            <!-- ================= SEARCH ================= -->
+
+            <div class="library-search">
+
+                <input
+                    type="text"
+                    id="librarySearch"
+                    data-i18n-placeholder="Search health information..."
+                    placeholder="Search health information..."
+                    oninput="searchLibrary()"
+                >
+
+            </div>
+
+
+            <!-- ================= LIBRARY ================= -->
+
+            <div
+                class="library-grid"
+                id="libraryGrid"
+            >
+
+
+                <!-- ================= COMMON DISEASES ================= -->
+
+                <div
+                    class="library-card"
+                    data-search="common diseases diabetes hypertension asthma migraine gastritis dengue influenza pneumonia malaria cold সাধারণ রোগ ডায়াবেটিস উচ্চ রক্তচাপ হাঁপানি মাইগ্রেন গ্যাস্ট্রাইটিস ডেঙ্গু ইনফ্লুয়েঞ্জা নিউমোনিয়া ম্যালেরিয়া সর্দি"
+                >
+
+                    <div class="library-icon">
+                        🩺
+                    </div>
+
+                    <h2 data-i18n="Common Diseases">
+                        Common Diseases
+                    </h2>
+
+                    <p data-i18n="Learn basic information about commonly encountered health conditions.">
+                        Learn basic information about commonly
+                        encountered health conditions.
+                    </p>
+
+                    <ul class="library-list">
+
+                        <li data-i18n="Diabetes">
+                            Diabetes
+                        </li>
+
+                        <li data-i18n="Hypertension">
+                            Hypertension
+                        </li>
+
+                        <li data-i18n="Asthma">
+                            Asthma
+                        </li>
+
+                        <li data-i18n="Migraine">
+                            Migraine
+                        </li>
+
+                        <li data-i18n="Gastritis">
+                            Gastritis
+                        </li>
+
+                        <li data-i18n="Dengue">
+                            Dengue
+                        </li>
+
+                        <li data-i18n="Influenza">
+                            Influenza
+                        </li>
+
+                        <li data-i18n="Pneumonia">
+                            Pneumonia
+                        </li>
+
+                        <li data-i18n="Malaria">
+                            Malaria
+                        </li>
+
+                        <li data-i18n="Common Cold">
+                            Common Cold
+                        </li>
+
+                    </ul>
+
+                </div>
+
+
+                <!-- ================= COMMON SYMPTOMS ================= -->
+
+                <div
+                    class="library-card"
+                    data-search="common symptoms fever headache cough chest pain abdominal pain shortness breath vomiting diarrhea fatigue সাধারণ উপসর্গ জ্বর মাথাব্যথা কাশি বুক ব্যথা পেট ব্যথা শ্বাসকষ্ট বমি ডায়রিয়া ক্লান্তি"
+                >
+
+                    <div class="library-icon">
+                        🤒
+                    </div>
+
+                    <h2 data-i18n="Common Symptoms">
+                        Common Symptoms
+                    </h2>
+
+                    <p data-i18n="Understand common symptoms and what they may indicate.">
+                        Understand common symptoms and what they
+                        may indicate.
+                    </p>
+
+                    <ul class="library-list">
+
+                        <li data-i18n="Fever">
+                            Fever
+                        </li>
+
+                        <li data-i18n="Headache">
+                            Headache
+                        </li>
+
+                        <li data-i18n="Cough">
+                            Cough
+                        </li>
+
+                        <li data-i18n="Chest Pain">
+                            Chest Pain
+                        </li>
+
+                        <li data-i18n="Abdominal Pain">
+                            Abdominal Pain
+                        </li>
+
+                        <li data-i18n="Shortness of Breath">
+                            Shortness of Breath
+                        </li>
+
+                        <li data-i18n="Vomiting">
+                            Vomiting
+                        </li>
+
+                        <li data-i18n="Diarrhea">
+                            Diarrhea
+                        </li>
+
+                        <li data-i18n="Fatigue">
+                            Fatigue
+                        </li>
+
+                    </ul>
+
+                </div>
+
+
+                <!-- ================= HEALTHY LIFESTYLE ================= -->
+
+                <div
+                    class="library-card"
+                    data-search="healthy lifestyle diet exercise sleep hydration hygiene healthy food স্বাস্থ্যকর জীবনযাপন খাদ্য ব্যায়াম ঘুম পানি স্বাস্থ্যকর খাবার পরিচ্ছন্নতা"
+                >
+
+                    <div class="library-icon">
+                        🥗
+                    </div>
+
+                    <h2 data-i18n="Healthy Lifestyle">
+                        Healthy Lifestyle
+                    </h2>
+
+                    <p data-i18n="Simple habits that can support your overall health and wellbeing.">
+                        Simple habits that can support your
+                        overall health and wellbeing.
+                    </p>
+
+                    <ul class="library-list">
+
+                        <li data-i18n="Eat a balanced diet">
+                            Eat a balanced diet
+                        </li>
+
+                        <li data-i18n="Exercise regularly">
+                            Exercise regularly
+                        </li>
+
+                        <li data-i18n="Get adequate sleep">
+                            Get adequate sleep
+                        </li>
+
+                        <li data-i18n="Stay hydrated">
+                            Stay hydrated
+                        </li>
+
+                        <li data-i18n="Maintain personal hygiene">
+                            Maintain personal hygiene
+                        </li>
+
+                        <li data-i18n="Avoid harmful habits">
+                            Avoid harmful habits
+                        </li>
+
+                    </ul>
+
+                </div>
+
+
+                <!-- ================= SPECIALIST GUIDE ================= -->
+
+                <div
+                    class="library-card"
+                    data-search="specialist guide doctor cardiologist dermatologist ophthalmologist pediatrician general practitioner বিশেষজ্ঞ ডাক্তার কার্ডিওলজিস্ট চর্মরোগ বিশেষজ্ঞ চক্ষু বিশেষজ্ঞ শিশু বিশেষজ্ঞ সাধারণ চিকিৎসক"
+                >
+
+                    <div class="library-icon">
+                        👨‍⚕️
+                    </div>
+
+                    <h2 data-i18n="Specialist Guide">
+                        Specialist Guide
+                    </h2>
+
+                    <p data-i18n="Learn which healthcare specialist may be appropriate for different health concerns.">
+                        Learn which healthcare specialist may be
+                        appropriate for different health concerns.
+                    </p>
+
+                    <ul class="library-list">
+
+                        <li data-i18n="Heart problems → Cardiologist">
+                            Heart problems → Cardiologist
+                        </li>
+
+                        <li data-i18n="Skin problems → Dermatologist">
+                            Skin problems → Dermatologist
+                        </li>
+
+                        <li data-i18n="Eye problems → Ophthalmologist">
+                            Eye problems → Ophthalmologist
+                        </li>
+
+                        <li data-i18n="Children's health → Pediatrician">
+                            Children's health → Pediatrician
+                        </li>
+
+                        <li data-i18n="General health → General Practitioner">
+                            General health → General Practitioner
+                        </li>
+
+                    </ul>
+
+                </div>
+
+
+                <!-- ================= DISEASE PREVENTION ================= -->
+
+                <div
+                    class="library-card"
+                    data-search="prevention disease prevention healthy habits hand washing vaccination nutrition exercise রোগ প্রতিরোধ প্রতিরোধ স্বাস্থ্যকর অভ্যাস হাত ধোয়া টিকা পুষ্টি ব্যায়াম"
+                >
+
+                    <div class="library-icon">
+                        🛡️
+                    </div>
+
+                    <h2 data-i18n="Disease Prevention">
+                        Disease Prevention
+                    </h2>
+
+                    <p data-i18n="General practices that can help reduce common health risks.">
+                        General practices that can help reduce
+                        common health risks.
+                    </p>
+
+                    <ul class="library-list">
+
+                        <li data-i18n="Wash hands regularly">
+                            Wash hands regularly
+                        </li>
+
+                        <li data-i18n="Maintain good hygiene">
+                            Maintain good hygiene
+                        </li>
+
+                        <li data-i18n="Eat nutritious food">
+                            Eat nutritious food
+                        </li>
+
+                        <li data-i18n="Exercise regularly">
+                            Exercise regularly
+                        </li>
+
+                        <li data-i18n="Get recommended vaccinations">
+                            Get recommended vaccinations
+                        </li>
+
+                        <li data-i18n="Have regular health checkups">
+                            Have regular health checkups
+                        </li>
+
+                    </ul>
+
+                </div>
+
+
+                <!-- ================= EMERGENCY ================= -->
+
+                <div
+                    class="library-card warning-card"
+                    data-search="emergency warning signs chest pain breathing unconscious severe bleeding stroke জরুরি সতর্কতা বুক ব্যথা শ্বাস নিতে সমস্যা অজ্ঞান গুরুতর রক্তপাত স্ট্রোক"
+                >
+
+                    <div class="library-icon">
+                        🚨
+                    </div>
+
+                    <h2 data-i18n="Emergency Warning Signs">
+                        Emergency Warning Signs
+                    </h2>
+
+                    <p data-i18n="Seek urgent medical attention if serious warning signs appear.">
+                        Seek urgent medical attention if serious
+                        warning signs appear.
+                    </p>
+
+                    <ul class="library-list">
+
+                        <li data-i18n="Severe chest pain">
+                            Severe chest pain
+                        </li>
+
+                        <li data-i18n="Difficulty breathing">
+                            Difficulty breathing
+                        </li>
+
+                        <li data-i18n="Loss of consciousness">
+                            Loss of consciousness
+                        </li>
+
+                        <li data-i18n="Severe bleeding">
+                            Severe bleeding
+                        </li>
+
+                        <li data-i18n="Sudden weakness or paralysis">
+                            Sudden weakness or paralysis
+                        </li>
+
+                        <li data-i18n="Severe or rapidly worsening symptoms">
+                            Severe or rapidly worsening symptoms
+                        </li>
+
+                    </ul>
+
+                </div>
+
+
+                <!-- ================= NO RESULTS ================= -->
+
+                <div
+                    id="noResults"
+                    class="library-card full-card"
+                    style="display:none;text-align:center;"
+                >
+
+                    <div
+                        class="library-icon"
+                        style="margin:0 auto 15px;"
+                    >
+                        🔍
+                    </div>
+
+                    <h2 data-i18n="No Information Found">
+                        No Information Found
+                    </h2>
+
+                    <p data-i18n="Try searching for another health topic.">
+                        Try searching for another health topic.
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <!-- ================= DISCLAIMER ================= -->
+
+            <div class="disclaimer">
+
+                ⚠
+
+                <strong data-i18n="Medical Disclaimer:">
+                    Medical Disclaimer:
+                </strong>
+
+                <span data-i18n="The information in this Health Library is for general educational purposes only. It does not replace professional medical diagnosis, treatment, or advice. Always consult a qualified healthcare professional for medical concerns.">
+                    The information in this Health Library is for
+                    general educational purposes only. It does not
+                    replace professional medical diagnosis, treatment,
+                    or advice. Always consult a qualified healthcare
+                    professional for medical concerns.
+                </span>
+
+            </div>
+
+        </div>
+
+    </main>
+
+</div>
+
+
+<!-- =====================================================
+     HEALTH LIBRARY SEARCH
+     ===================================================== -->
+
+<script>
+
+    function searchLibrary() {
+
+        const input =
+            document.getElementById("librarySearch");
+
+        const query =
+            input.value
+                .toLowerCase()
+                .trim();
+
+
+        const cards =
+            document.querySelectorAll(
+                "#libraryGrid .library-card[data-search]"
+            );
+
+
+        let visibleCount = 0;
+
+
+        cards.forEach(card => {
+
+            /*
+             * Search both:
+             * 1. English/Bangla keywords from data-search
+             * 2. Currently visible translated text
+             */
+            const searchText =
+                (
+                    card.dataset.search +
+                    " " +
+                    card.textContent
+                )
+                .toLowerCase();
+
+
+            if (
+                !query ||
+                searchText.includes(query)
+            ) {
+
+                card.style.display = "block";
+
+                visibleCount++;
+
+            } else {
+
+                card.style.display = "none";
+
+            }
+
+        });
+
+
+        const noResults =
+            document.getElementById("noResults");
+
+
+        noResults.style.display =
+            visibleCount === 0
+                ? "block"
+                : "none";
+
+    }
+
+</script>
+
+
+<!-- =====================================================
+     LANGUAGE INITIALIZATION
+     ===================================================== -->
+
+<script>
+
+    /*
+     * Apply the saved language after the page is loaded.
+     * language.js also handles dynamic text through
+     * MutationObserver.
+     */
+
+    document.addEventListener("DOMContentLoaded", function () {
+
+        if (typeof applyLanguage === "function") {
+            applyLanguage();
+        }
+
+    });
+
+</script>
+
+</body>
+</html>

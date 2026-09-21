@@ -1,0 +1,1133 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>MediFlow - Home</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='style.css') }}">
+
+    <style>
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f5f7fb;
+            color: #1f2937;
+        }
+
+        .app {
+            display: flex;
+            min-height: 100vh;
+        }
+
+
+        /* ================= SIDEBAR ================= */
+
+        .sidebar {
+            width: 250px;
+            background: white;
+            border-right: 1px solid #e5e7eb;
+            padding: 25px 18px;
+            position: fixed;
+            left: 0;
+            top: 0;
+            bottom: 0;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 35px;
+            padding-left: 10px;
+        }
+
+        .logo-icon {
+            width: 38px;
+            height: 38px;
+            border-radius: 10px;
+            background: #2563eb;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            font-weight: bold;
+        }
+
+        .logo-text {
+            font-size: 24px;
+            font-weight: 700;
+        }
+
+        .nav {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 13px;
+            padding: 13px 15px;
+            border-radius: 10px;
+            text-decoration: none;
+            color: #666;
+            transition: 0.2s;
+        }
+
+        .nav-item:hover {
+            background: #eef4ff;
+            color: #2563eb;
+        }
+
+        .nav-item.active {
+            background: #2563eb;
+            color: white;
+        }
+
+        .nav-icon {
+            width: 24px;
+            text-align: center;
+        }
+
+
+        /* ================= MAIN ================= */
+
+        .main {
+            margin-left: 250px;
+            width: calc(100% - 250px);
+        }
+
+        .topbar {
+            height: 75px;
+            background: white;
+            border-bottom: 1px solid #e5e7eb;
+
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+
+            padding: 0 30px;
+        }
+
+        .user {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .avatar {
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+
+            background: #2563eb;
+            color: white;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            font-weight: bold;
+        }
+
+        .content {
+            padding: 35px;
+            max-width: 1400px;
+        }
+
+
+        /* ================= HERO ================= */
+
+        .hero {
+            background: linear-gradient(
+                135deg,
+                #2563eb 0%,
+                #4f46e5 100%
+            );
+
+            border-radius: 20px;
+            padding: 45px;
+
+            color: white;
+
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+
+            gap: 30px;
+
+            margin-bottom: 30px;
+
+            box-shadow: 0 12px 30px rgba(37, 99, 235, 0.20);
+        }
+
+        .hero-content {
+            max-width: 700px;
+        }
+
+        .hero h1 {
+            margin: 0 0 15px;
+            font-size: 38px;
+            line-height: 1.2;
+        }
+
+        .hero p {
+            margin: 0 0 25px;
+            font-size: 16px;
+            line-height: 1.7;
+            opacity: 0.95;
+        }
+
+        .hero-badge {
+            display: inline-block;
+            background: rgba(255,255,255,0.15);
+            padding: 8px 14px;
+            border-radius: 20px;
+            font-size: 13px;
+            margin-bottom: 18px;
+        }
+
+        .hero-actions {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .hero-btn {
+            display: inline-block;
+            text-decoration: none;
+            padding: 13px 20px;
+            border-radius: 10px;
+            font-weight: 600;
+            transition: 0.2s;
+        }
+
+        .hero-btn.primary {
+            background: white;
+            color: #2563eb;
+        }
+
+        .hero-btn.secondary {
+            background: rgba(255,255,255,0.15);
+            color: white;
+            border: 1px solid rgba(255,255,255,0.3);
+        }
+
+        .hero-btn:hover {
+            transform: translateY(-2px);
+        }
+
+
+        /* ================= WELCOME CARD ================= */
+
+        .section-title {
+            margin-bottom: 18px;
+        }
+
+        .section-title h2 {
+            margin: 0 0 6px;
+            font-size: 22px;
+        }
+
+        .section-title p {
+            margin: 0;
+            color: #6b7280;
+            font-size: 14px;
+        }
+
+
+        /* ================= MAIN HEALTH SERVICES ================= */
+
+        .services-title {
+            margin-top: 8px;
+        }
+
+        .primary-services-grid {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 18px;
+            margin-bottom: 32px;
+        }
+
+        .primary-service-card {
+            position: relative;
+            display: flex;
+            align-items: flex-start;
+            gap: 15px;
+            min-height: 145px;
+            padding: 22px;
+            border: 1px solid #e5e7eb;
+            border-radius: 16px;
+            background: #fff;
+            color: #1f2937;
+            text-decoration: none;
+            box-shadow: 0 5px 18px rgba(0,0,0,.05);
+            transition: transform .2s ease, border-color .2s ease, box-shadow .2s ease;
+        }
+
+        .primary-service-card:hover {
+            transform: translateY(-4px);
+            border-color: #93c5fd;
+            box-shadow: 0 12px 28px rgba(37,99,235,.12);
+        }
+
+        .primary-service-icon {
+            flex: 0 0 48px;
+            width: 48px;
+            height: 48px;
+            border-radius: 13px;
+            background: #eff6ff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+        }
+
+        .primary-service-card h3 {
+            margin: 1px 0 7px;
+            font-size: 17px;
+        }
+
+        .primary-service-card p {
+            margin: 0;
+            color: #6b7280;
+            font-size: 13px;
+            line-height: 1.55;
+        }
+
+        .service-arrow {
+            position: absolute;
+            right: 18px;
+            bottom: 15px;
+            font-size: 20px;
+            color: #2563eb;
+            font-weight: 700;
+        }
+
+        @media (max-width: 1000px) {
+            .primary-services-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* ================= QUICK ACCESS ================= */
+
+        .quick-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 18px;
+
+            margin-bottom: 30px;
+        }
+
+        .quick-card {
+            background: white;
+            border: 1px solid #e5e7eb;
+            border-radius: 15px;
+            padding: 22px;
+
+            text-decoration: none;
+            color: #1f2937;
+
+            transition: 0.2s;
+
+            box-shadow: 0 4px 15px rgba(0,0,0,0.04);
+        }
+
+        .quick-card:hover {
+            transform: translateY(-4px);
+            border-color: #bfdbfe;
+            box-shadow: 0 10px 25px rgba(37,99,235,0.10);
+        }
+
+        .quick-icon {
+            width: 45px;
+            height: 45px;
+
+            border-radius: 12px;
+
+            background: #eff6ff;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            font-size: 22px;
+
+            margin-bottom: 15px;
+        }
+
+        .quick-card h3 {
+            margin: 0 0 7px;
+            font-size: 16px;
+        }
+
+        .quick-card p {
+            margin: 0;
+            color: #6b7280;
+            font-size: 13px;
+            line-height: 1.5;
+        }
+
+
+        /* ================= HOW IT WORKS ================= */
+
+        .how-section {
+            background: white;
+            border-radius: 18px;
+            padding: 28px;
+
+            margin-bottom: 25px;
+
+            border: 1px solid #e5e7eb;
+        }
+
+        .steps {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+        }
+
+        .step {
+            padding: 20px;
+            background: #f8fafc;
+            border-radius: 12px;
+        }
+
+        .step-number {
+            width: 35px;
+            height: 35px;
+
+            background: #2563eb;
+            color: white;
+
+            border-radius: 50%;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            font-weight: bold;
+
+            margin-bottom: 12px;
+        }
+
+        .step h3 {
+            margin: 0 0 7px;
+            font-size: 16px;
+        }
+
+        .step p {
+            margin: 0;
+            color: #6b7280;
+            font-size: 13px;
+            line-height: 1.6;
+        }
+
+
+        /* ================= FEATURES ================= */
+
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+
+            margin-bottom: 25px;
+        }
+
+        .feature-card {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+
+            border: 1px solid #e5e7eb;
+        }
+
+        .feature-card h3 {
+            margin: 0 0 10px;
+            font-size: 18px;
+        }
+
+        .feature-card p {
+            margin: 0;
+            color: #6b7280;
+            line-height: 1.7;
+            font-size: 14px;
+        }
+
+
+        /* ================= EMERGENCY ================= */
+
+        .emergency {
+            background: #fff7ed;
+            border-left: 5px solid #f97316;
+
+            border-radius: 12px;
+
+            padding: 20px;
+
+            margin-bottom: 25px;
+        }
+
+        .emergency h3 {
+            margin: 0 0 8px;
+            color: #c2410c;
+        }
+
+        .emergency p {
+            margin: 0;
+            color: #7c2d12;
+            line-height: 1.6;
+            font-size: 14px;
+        }
+
+
+        /* ================= DISCLAIMER ================= */
+
+        .disclaimer {
+            background: white;
+            border-radius: 12px;
+
+            padding: 18px;
+
+            color: #6b7280;
+
+            font-size: 13px;
+            line-height: 1.6;
+
+            border: 1px solid #e5e7eb;
+        }
+
+
+        /* ================= RESPONSIVE ================= */
+
+        @media (max-width: 1100px) {
+
+            .quick-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .steps {
+                grid-template-columns: 1fr;
+            }
+        }
+
+
+        /* ================= CREATOR PROFILE ================= */
+
+        .hero-profile {
+            flex: 0 0 285px;
+            width: 285px;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .hero-profile-photo {
+            width: 190px;
+            height: 190px;
+            border-radius: 50%;
+            object-fit: cover;
+            object-position: center center;
+            border: 6px solid rgba(255,255,255,0.98);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.18);
+            background: #fff;
+        }
+
+        .hero-profile-name {
+            margin-top: 14px;
+            font-size: 22px;
+            font-weight: 700;
+            color: #fff;
+        }
+
+        .hero-profile-role {
+            margin-top: 5px;
+            font-size: 14px;
+            color: rgba(255,255,255,0.9);
+        }
+
+        .hero-profile-college {
+            margin-top: 9px;
+            font-size: 13px;
+            line-height: 1.45;
+            color: rgba(255,255,255,0.88);
+        }
+
+        @media (max-width: 800px) {
+
+            .sidebar {
+                width: 210px;
+            }
+
+            .main {
+                margin-left: 210px;
+                width: calc(100% - 210px);
+            }
+
+            .content {
+                padding: 20px;
+            }
+
+            .hero {
+                padding: 30px;
+            }
+
+            .hero h1 {
+                font-size: 30px;
+            }
+
+            .hero-profile {
+                flex-basis: 210px;
+                width: 210px;
+            }
+
+            .hero-profile-photo {
+                width: 145px;
+                height: 145px;
+            }
+
+            .feature-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+
+        @media (max-width: 600px) {
+
+            .sidebar {
+                width: 180px;
+            }
+
+            .main {
+                margin-left: 180px;
+                width: calc(100% - 180px);
+            }
+
+            .quick-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+    </style>
+<script src="{{ url_for('static', filename='js/language.js') }}"></script>
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='theme.css') }}">
+</head>
+
+
+<body>
+
+<div class="app">
+
+    <!-- ================= SIDEBAR ================= -->
+
+    <aside class="sidebar">
+
+        <div class="logo">
+
+            <div class="logo-icon">
+                +
+            </div>
+
+            <div class="logo-text">
+                MediFlow
+            </div>
+
+        </div>
+
+
+        <nav class="nav">
+
+            <a href="{{ url_for('home') }}"
+               class="nav-item active">
+
+                <span class="nav-icon" aria-hidden="true">🏠</span>
+
+                <span data-i18n="Home">Home</span>
+
+            </a>
+
+
+            <a href="{{ url_for('symptom_checker') }}"
+               class="nav-item">
+
+                <span class="nav-icon" aria-hidden="true">🩺</span>
+
+                <span data-i18n="Symptom Checker">Symptom Checker</span>
+
+            </a>
+
+
+            <a href="{{ url_for('skin_disease_analysis') }}" class="nav-item">
+                <span class="nav-icon">🧴</span>
+                <span data-i18n="Skin Disease Analysis">Skin Disease Analysis</span>
+            </a>
+
+            <a href="{{ url_for('find_specialists') }}"
+               class="nav-item">
+
+                <span class="nav-icon" aria-hidden="true">📍</span>
+
+                <span data-i18n="Find Specialists">Find Specialists</span>
+
+            </a>
+
+
+            <a href="{{ url_for('health_library') }}"
+               class="nav-item">
+
+                <span class="nav-icon" aria-hidden="true">📚</span>
+
+                <span data-i18n="Health Library">Health Library</span>
+
+            </a>
+
+
+            <a href="{{ url_for('saved_results') }}"
+               class="nav-item">
+
+                <span class="nav-icon" aria-hidden="true">⭐</span>
+
+                <span data-i18n="Saved Results">Saved Results</span>
+
+            </a>
+
+
+            <a href="{{ url_for('settings') }}"
+               class="nav-item">
+
+                <span class="nav-icon" aria-hidden="true">⚙️</span>
+
+                <span data-i18n="Settings">Settings</span>
+
+            </a>
+
+        </nav>
+
+    </aside>
+
+
+
+    <!-- ================= MAIN ================= -->
+
+    <main class="main">
+
+
+        <!-- TOPBAR -->
+
+        <div class="topbar">
+
+            <a class="user" href="{{ url_for('profile') }}" id="globalProfileLink" style="text-decoration:none;color:inherit;cursor:pointer;">
+
+                <div class="avatar" id="globalUserAvatar">
+                    MF
+                </div>
+
+                <span id="globalUserName">
+                    MediFlow User
+                </span>
+
+            </a>
+
+        </div>
+
+
+
+        <div class="content">
+
+
+            <!-- ================= HERO ================= -->
+
+            <section class="hero">
+
+                <div class="hero-content">
+
+                    <div class="hero-badge">
+                        ✦ AI-Powered Healthcare Assistant
+                    </div>
+
+                    <h1>
+                        Your Health,<br>
+                        Our Priority.
+                    </h1>
+
+                    <p>
+                        MediFlow helps you understand your symptoms,
+                        explore possible health conditions, and find
+                        the right healthcare specialist.
+                    </p>
+
+
+                    <div class="hero-actions">
+
+                        <a href="{{ url_for('symptom_checker') }}"
+                           class="hero-btn primary">
+
+                            🩺 <span data-i18n="Check Your Symptoms">Check Your Symptoms</span>
+
+                        </a>
+
+
+                        <a href="{{ url_for('find_specialists') }}"
+                           class="hero-btn secondary">
+
+                            📍 <span data-i18n="Find Specialists">Find Specialists</span>
+
+                        </a>
+
+                        <a href="{{ url_for('skin_disease_analysis') }}"
+                           class="hero-btn secondary">
+
+                            🧴 <span data-i18n="Skin Disease Analysis">Skin Disease Analysis</span>
+
+                        </a>
+
+                    </div>
+
+                </div>
+
+                <div class="hero-profile">
+                    <img
+                        src="{{ url_for('static', filename='images/fabian-bhuiyan.jpg') }}"
+                        alt="Fabian Bhuiyan"
+                        class="hero-profile-photo"
+                    >
+                    <div class="hero-profile-name">Fabian Bhuiyan</div>
+                    <div class="hero-profile-role">Student &amp; Developer of MediFlow</div>
+                    <div class="hero-profile-college">
+                        Lincoln University College, Malaysia<br>
+                        BSc in Computer Science &amp; Artificial Intelligence
+                    </div>
+                </div>
+
+            </section>
+
+
+
+            <!-- ================= MAIN HEALTH SERVICES ================= -->
+
+            <div class="section-title services-title">
+                <h2 data-i18n="Health Services">Health Services</h2>
+                <p data-i18n="Choose a service to check symptoms, analyze a skin image, or find a specialist.">
+                    Choose a service to check symptoms, analyze a skin image, or find a specialist.
+                </p>
+            </div>
+
+            <div class="primary-services-grid">
+
+                <a href="{{ url_for('symptom_checker') }}" class="primary-service-card">
+                    <div class="primary-service-icon">🩺</div>
+                    <div>
+                        <h3 data-i18n="Check Your Symptoms">Check Your Symptoms</h3>
+                        <p data-i18n="Describe your symptoms and explore possible health conditions.">
+                            Describe your symptoms and explore possible health conditions.
+                        </p>
+                    </div>
+                    <span class="service-arrow" aria-hidden="true">→</span>
+                </a>
+
+                <a href="{{ url_for('skin_disease_analysis') }}" class="primary-service-card skin-service-card">
+                    <div class="primary-service-icon">🧴</div>
+                    <div>
+                        <h3 data-i18n="Skin Disease Analysis">Skin Disease Analysis</h3>
+                        <p data-i18n="Upload a skin image or use your camera for an AI-assisted screening result.">
+                            Upload a skin image or use your camera for an AI-assisted screening result.
+                        </p>
+                    </div>
+                    <span class="service-arrow" aria-hidden="true">→</span>
+                </a>
+
+                <a href="{{ url_for('find_specialists') }}" class="primary-service-card">
+                    <div class="primary-service-icon">👨‍⚕️</div>
+                    <div>
+                        <h3 data-i18n="Find Specialists">Find Specialists</h3>
+                        <p data-i18n="Find suitable healthcare specialists for your concerns.">
+                            Find suitable healthcare specialists for your concerns.
+                        </p>
+                    </div>
+                    <span class="service-arrow" aria-hidden="true">→</span>
+                </a>
+
+            </div>
+
+
+            <!-- ================= QUICK ACCESS ================= -->
+
+            <div class="section-title">
+
+                <h2 data-i18n="Quick Access">
+                    Quick Access
+                </h2>
+
+                <p data-i18n="Everything you need to manage your health information.">
+                    Everything you need to manage your health information.
+                </p>
+
+            </div>
+
+
+            <div class="quick-grid">
+
+
+                <a href="{{ url_for('symptom_checker') }}"
+                   class="quick-card">
+
+                    <div class="quick-icon">
+                        🩺
+                    </div>
+
+                    <h3 data-i18n="Symptom Checker">
+                        Symptom Checker
+                    </h3>
+
+                    <p>
+                        Describe your symptoms and explore possible
+                        health conditions.
+                    </p>
+
+                </a>
+
+
+
+                <a href="{{ url_for('skin_disease_analysis') }}" class="quick-card">
+                    <div class="quick-icon">🧴</div>
+                    <h3 data-i18n="Skin Disease Analysis">Skin Disease Analysis</h3>
+                    <p data-i18n="Upload a skin image for an AI-assisted screening result.">Upload a skin image for an AI-assisted screening result.</p>
+                </a>
+
+                <a href="{{ url_for('find_specialists') }}"
+                   class="quick-card">
+
+                    <div class="quick-icon">
+                        👨‍⚕️
+                    </div>
+
+                    <h3 data-i18n="Find Specialists">
+                        Find Specialists
+                    </h3>
+
+                    <p>
+                        Find suitable healthcare specialists
+                        for your concerns.
+                    </p>
+
+                </a>
+
+
+
+                <a href="{{ url_for('health_library') }}"
+                   class="quick-card">
+
+                    <div class="quick-icon">
+                        📚
+                    </div>
+
+                    <h3 data-i18n="Health Library">
+                        Health Library
+                    </h3>
+
+                    <p>
+                        Learn about diseases, symptoms,
+                        prevention and healthy habits.
+                    </p>
+
+                </a>
+
+
+
+                <a href="{{ url_for('saved_results') }}"
+                   class="quick-card">
+
+                    <div class="quick-icon">
+                        ⭐
+                    </div>
+
+                    <h3 data-i18n="Saved Results">
+                        Saved Results
+                    </h3>
+
+                    <p>
+                        Review your previously saved
+                        health analysis results.
+                    </p>
+
+                </a>
+
+            </div>
+
+
+
+            <!-- ================= HOW IT WORKS ================= -->
+
+            <section class="how-section">
+
+                <div class="section-title">
+
+                    <h2>
+                        How MediFlow Works
+                    </h2>
+
+                    <p>
+                        Get useful health information in three simple steps.
+                    </p>
+
+                </div>
+
+
+                <div class="steps">
+
+
+                    <div class="step">
+
+                        <div class="step-number">
+                            1
+                        </div>
+
+                        <h3>
+                            Describe Your Symptoms
+                        </h3>
+
+                        <p>
+                            Enter your symptoms manually or describe
+                            how you are feeling in natural language.
+                        </p>
+
+                    </div>
+
+
+
+                    <div class="step">
+
+                        <div class="step-number">
+                            2
+                        </div>
+
+                        <h3>
+                            Get an Analysis
+                        </h3>
+
+                        <p>
+                            MediFlow analyzes the available information
+                            and provides possible health conditions.
+                        </p>
+
+                    </div>
+
+
+
+                    <div class="step">
+
+                        <div class="step-number">
+                            3
+                        </div>
+
+                        <h3>
+                            Find the Right Specialist
+                        </h3>
+
+                        <p>
+                            Explore recommended healthcare specialists
+                            and nearby facilities.
+                        </p>
+
+                    </div>
+
+                </div>
+
+            </section>
+
+
+
+            <!-- ================= FEATURES ================= -->
+
+            <div class="feature-grid">
+
+
+                <div class="feature-card">
+
+                    <h3>
+                        🤖 AI-Assisted Analysis
+                    </h3>
+
+                    <p>
+                        Use symptom information to explore possible
+                        conditions and receive useful healthcare guidance.
+                    </p>
+
+                </div>
+
+
+
+                <div class="feature-card">
+
+                    <h3>
+                        🔒 Your Health Information
+                    </h3>
+
+                    <p>
+                        MediFlow provides convenient tools for managing
+                        your locally saved analysis information.
+                    </p>
+
+                </div>
+
+            </div>
+
+
+
+            <!-- ================= EMERGENCY ================= -->
+
+            <div class="emergency">
+
+                <h3>
+                    🚨 Emergency Warning
+                </h3>
+
+                <p>
+                    If you experience severe chest pain, serious
+                    breathing difficulty, loss of consciousness,
+                    severe bleeding, sudden paralysis, or rapidly
+                    worsening symptoms, seek urgent medical attention.
+                </p>
+
+            </div>
+
+
+
+            <!-- ================= DISCLAIMER ================= -->
+
+            <div class="disclaimer">
+
+                ⚠ <strong>Medical Disclaimer:</strong>
+
+                MediFlow is an informational healthcare assistant.
+                Its predictions and information do not replace
+                professional medical diagnosis, treatment, or advice.
+                Always consult a qualified healthcare professional
+                for medical concerns.
+
+            </div>
+
+
+        </div>
+
+    </main>
+
+</div>
+
+</body>
+</html>

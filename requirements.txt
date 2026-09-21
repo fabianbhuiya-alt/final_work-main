@@ -1,0 +1,31 @@
+# Data manipulation & numerical (used in preprocessing)
+numpy>=2.1.0,<3.0
+pandas
+scipy
+
+# Visualisation 
+matplotlib
+seaborn
+
+# Machine learning & preprocessing (used in training)
+scikit-learn
+xgboost
+imbalanced-learn
+
+# Model serialisation
+joblib
+
+# Web framework (API & frontend)
+flask
+flask-cors
+gunicorn
+
+# Environment variables
+python-dotenv
+
+# Jupyter 
+ipykernel
+imbalanced-learn
+
+# Skin image analysis
+pillow
